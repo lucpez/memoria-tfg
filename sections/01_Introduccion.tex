@@ -1,0 +1,113 @@
+\chapter{Introducción}\label{cap:introduccion}
+
+A lo largo de los últimos años, la adopción de servicios en la nube se ha consolidado
+como el paradigma predominante para el despliegue de aplicaciones y la gestión de
+infraestructura. Sin embargo, detrás de la aparente simplicidad que los proveedores
+cloud prometen, subyace un conjunto de complejidades técnicas, económicas y
+organizacionales que condicionan profundamente las decisiones de quienes trabajan
+con estas tecnologías. Este capítulo presenta la motivación que da origen a este
+trabajo, los objetivos que se persiguen y la estructura que sigue la memoria.
+
+\section{Motivación}
+
+Mi interés por las tecnologías cloud surgió de forma gradual durante los años de
+formación, a través de la exploración de distintos campos de la ingeniería del
+software. Mi acercamiento a \textbf{Amazon Web Services (AWS)} —y la obtención de
+la certificación \textbf{AWS Cloud Practitioner}— me permitió comprender de primera
+mano tanto las posibilidades que ofrece la nube como las fricciones que aparecen en
+cuanto se profundiza en su uso real.
+
+Una de las primeras fricciones que identifiqué fue el \textbf{compromiso tecnológico}
+que exige cada proveedor. Aunque los conceptos fundamentales de la computación en
+la nube son transferibles entre plataformas, las tecnologías concretas no lo son:
+los servicios, las nomenclaturas, las herramientas de gestión y los modelos de
+configuración son específicos de cada proveedor. Aprender a desplegar en AWS no
+me preparaba para desplegar en \textbf{Microsoft Azure} o en \textbf{Google Cloud
+Platform (GCP)}; cada uno exige su propio proceso de aprendizaje.
+
+A esta dificultad se suma la opacidad en la estimación de costes. Aunque los
+proveedores ofrecen herramientas de cálculo —como la calculadora de costes de
+AWS—, su uso requiere conocimiento previo de los servicios contratados, acceso a
+una cuenta activa y criterio suficiente para modelar correctamente el escenario
+de despliegue. En mis primeros pasos con la nube me encontré con que estimar qué
+iba a costar un despliegue era, en sí mismo, un problema no trivial.
+
+Con el tiempo, la experiencia laboral me permitió observar estas mismas fricciones
+a escala organizacional. En entornos profesionales, la elección de un proveedor cloud
+no es una decisión puramente técnica: implica estudios económicos comparativos,
+negociaciones con proveedores, formación especializada del equipo y, en muchos
+casos, la dependencia de empresas externas especializadas en la gestión de
+infraestructura. Lo que conceptualmente debería ser sencillo —desplegar una
+aplicación en la nube— se convierte en un proceso complejo que requiere recursos
+y conocimientos que no siempre están disponibles.
+
+Es en este contexto donde surge la motivación para desarrollar \textbf{CloudPorter},
+una herramienta que permita describir infraestructura de forma agnóstica al
+proveedor y desplegarla en distintos clouds, reduciendo el coste de entrada,
+facilitando la comparación económica entre alternativas y disminuyendo el grado
+de compromiso tecnológico que hoy exige la nube.
+
+\section{Objetivos}
+
+Este trabajo no se concibe como la implementación de un sistema cerrado y completo,
+sino como una exploración fundamentada de un problema real —el \textbf{cloud lock-in}— con el objetivo de construir una base sólida sobre la
+que seguir avanzando. Los requisitos que se presentan en el capítulo~\ref{cap:especificacion}
+describen el sistema en su forma ideal; los objetivos que se enuncian aquí definen
+la dirección del trabajo y el alcance que se persigue alcanzar.
+
+El \textbf{objetivo general} de este TFG es desarrollar \textbf{CloudPorter}, una
+herramienta que permita describir infraestructura cloud de forma agnóstica al
+proveedor y desplegarla en distintas plataformas, reduciendo el compromiso
+tecnológico y económico que hoy exige trabajar con la nube.
+
+Para guiar el desarrollo hacia ese objetivo, se identifican los siguientes
+\textbf{objetivos específicos}:
+
+\begin{enumerate}
+    \item \textbf{Definir una abstracción cloud-agnóstica} que permita describir
+    infraestructura sin acoplarse a un proveedor concreto.
+
+    \item \textbf{Demostrar que esa abstracción es desplegable} en múltiples
+    plataformas cloud reales.
+
+    \item \textbf{Incorporar visibilidad económica} que permita comparar el coste
+    entre proveedores.
+
+    \item \textbf{Ofrecer una interfaz accesible} que no exija conocimiento
+    profundo de cada proveedor para operar la herramienta.
+\end{enumerate}
+
+\section{Estructura de la memoria}
+
+La memoria se organiza en ocho capítulos que siguen la progresión natural del
+trabajo: desde la definición del problema hasta el análisis de los resultados
+obtenidos y las líneas de trabajo futuro.
+
+\begin{itemize}
+    \item \textbf{Capítulo~\ref{cap:descripcion} — Descripción del problema:}
+    analiza el cloud lock-in en sus dimensiones técnicas, económicas y
+    organizacionales, y presenta la solución propuesta.
+
+    \item \textbf{Capítulo~\ref{cap:estado} — Estado del arte:}
+    revisa las herramientas existentes y sitúa CloudPorter en relación con ellas.
+
+    \item \textbf{Capítulo~\ref{cap:especificacion} — Especificación de requisitos:}
+    recoge los requisitos del sistema, distinguiendo el alcance del trabajo de
+    las líneas de evolución futura.
+
+    \item \textbf{Capítulo~\ref{cap:planificacion} — Planificación y metodología:}
+    describe la metodología de desarrollo adoptada, el cronograma y la planificación
+    del trabajo.
+
+    \item \textbf{Capítulo~\ref{cap:desarrollo} — Desarrollo:}
+    núcleo de la memoria; documenta el desarrollo iterativo de CloudPorter mediante
+    ciclos Kanban, con las decisiones de diseño, la implementación y los resultados
+    de cada iteración.
+
+    \item \textbf{Capítulo~\ref{cap:evaluacion} — Evaluación:}
+    presenta la validación del sistema construido frente a los requisitos definidos.
+
+    \item \textbf{Capítulo~\ref{cap:conclusiones} — Conclusiones:}
+    recoge los aprendizajes obtenidos, el alcance alcanzado y las líneas de
+    desarrollo futuro que quedan abiertas.
+\end{itemize}

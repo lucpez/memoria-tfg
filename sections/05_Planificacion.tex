@@ -1,0 +1,318 @@
+\chapter{Planificación y metodología}\label{cap:planificacion}
+
+Este capítulo describe cómo se ha organizado el trabajo para abordar un problema
+de la magnitud del cloud lock-in en el marco de un Trabajo de Fin de Grado. Se
+presenta la estrategia de desarrollo adoptada, la metodología y las herramientas
+utilizadas, la planificación temporal y una estimación del presupuesto del proyecto.
+
+\section{Estrategia de desarrollo}
+
+El problema que aborda CloudPorter es amplio y sus dimensiones —abstracción de
+infraestructura, estimación de costes, seguridad— no pueden
+abordarse en paralelo con los recursos disponibles. La estrategia adoptada consiste
+en construir de dentro hacia afuera: primero el núcleo que hace viable el enfoque,
+y después las capas que lo enriquecen.
+
+El punto de partida es la traducción Manifest → proveedor cloud, ya que sin ella
+el resto del sistema carece de base. Una vez demostrada esa viabilidad, se
+desarrollan de forma independiente el análisis estático de seguridad de las plantillas generadas —que detecta
+configuraciones inseguras antes de cualquier ejecución— y el módulo de estimación
+de costes, que permite comparar el coste de la arquitectura entre proveedores sin
+necesidad de infraestructura real. Ambos módulos permiten demostrar el valor de
+la herramienta antes de desplegar nada.
+
+A continuación se construye la CLI como capa de integración que unifica y expone
+al usuario el conjunto de funcionalidades anteriores. El despliegue efectivo de
+infraestructura se incorpora al final, cuando el resto del sistema ya está
+validado: es el punto donde todo converge y donde el enfoque agnóstico se
+materializa en recursos reales en la nube.
+
+En cuanto a la elección de proveedores, se ha optado por \textbf{AWS} y
+\textbf{Microsoft Azure} como plataformas objetivo de la versión inicial. AWS es
+el líder indiscutible del mercado cloud y el punto de referencia para cualquier
+herramienta de infraestructura; Azure es el segundo proveedor por cuota de mercado
+y el más presente en entornos empresariales —precisamente el contexto donde el
+lock-in tiene mayor impacto organizacional y económico \cite{flexera2026}. El
+soporte a dos proveedores es suficiente para demostrar la viabilidad del enfoque
+agnóstico.
+
+\section{Metodología}
+
+\subsection{Kanban}
+
+Se ha adoptado \textbf{Kanban} como metodología de desarrollo por su adecuación
+al carácter exploratorio del proyecto. A diferencia de metodologías con sprints
+fijos como Scrum, Kanban permite un flujo continuo de trabajo sin comprometerse
+con un volumen predefinido de tareas por iteración — lo que encaja con un proyecto
+donde el diseño emerge durante el desarrollo y las prioridades pueden cambiar en
+función de los resultados obtenidos.
+
+El tablero Kanban se gestiona íntegramente en \textbf{GitHub Projects}, integrado
+con el repositorio del código. Cada unidad de trabajo se representa como un
+\textit{issue} de GitHub, que recorre las columnas del tablero desde su definición
+hasta su cierre. Las columnas del tablero son:
+
+\begin{enumerate}
+    \item \textbf{Backlog:} ideas y tareas pendientes de priorizar.
+    \item \textbf{En curso:} tarea actualmente en desarrollo.
+    \item \textbf{En revisión:} pull request abierto pendiente de revisión.
+    \item \textbf{Hecho:} tarea completada y mergeada.
+\end{enumerate}
+
+Cada issue da lugar a una rama de trabajo con el esquema
+\texttt{feat/<número>-<descripción>}, que se integra en \texttt{main} mediante
+un pull request una vez superados los checks de CI. La rama principal está
+protegida y no recibe cambios directos.
+
+Los mensajes de commit siguen la especificación \textbf{Conventional
+Commits}~\cite{conventionalCommits}, que establece un formato estructurado
+—\texttt{tipo(ámbito): descripción}— legible tanto por personas como por
+herramientas de automatización.
+
+Cada issue de cierta entidad da lugar a un ciclo de desarrollo documentado en el
+capítulo~\ref{cap:desarrollo}, siguiendo la estructura: objetivo de la iteración,
+decisiones de diseño, implementación y resultado.
+
+\subsection{Ciclo de desarrollo}
+
+El ciclo de desarrollo para cada iteración sigue el siguiente flujo:
+
+\begin{enumerate}
+    \item \textbf{Definición del issue:} se describe el objetivo, el contexto y
+    los criterios de aceptación en el issue de GitHub.
+
+    \item \textbf{Diseño:} antes de implementar, se toman y documentan las
+    decisiones de diseño relevantes — qué se construye, cómo y por qué.
+
+    \item \textbf{Implementación:} esta fase se hace con el apoyo
+    de \textbf{Claude Code}\cite{claudeCode}, un agente de programación
+    cuyo uso se documenta explícitamente como parte de la metodología por su
+    relevancia en el contexto actual del desarrollo de software.
+
+    \item \textbf{Calidad local:} antes de subir el código se aplican controles
+    automáticos en el entorno local —formato, tipos y tests— que actúan como
+    primera barrera de calidad. El objetivo es que ningún cambio salga del
+    entorno de desarrollo sin cumplir los estándares definidos.
+
+    \item \textbf{Pull request y revisión:} el trabajo se integra mediante un
+    pull request sobre el que se ejecutan automáticamente los checks de
+    integración continua como segunda barrera antes del merge. La revisión
+    verifica además la coherencia del cambio con las decisiones de diseño
+    de la iteración.
+
+    \item \textbf{Documentación:} una vez cerrado el issue, la iteración queda
+    recogida en el capítulo~\ref{cap:desarrollo} con su objetivo, las decisiones
+    tomadas, la implementación realizada y el resultado obtenido.
+\end{enumerate}
+
+\subsection{Motor de infraestructura como código}\label{subsec:decisiones}
+
+Una de las decisiones transversales del proyecto es el uso de \textbf{OpenTofu}
+\cite{opentofuDocs} como motor de generación y despliegue de infraestructura, en
+lugar de \textbf{Terraform}. Aunque Terraform es la herramienta IaC más extendida,
+en agosto de 2023 su empresa matriz, HashiCorp, cambió su licencia de
+\textit{Mozilla Public License 2.0} (MPL-2.0, open source) a
+\textit{Business Source License 1.1} (\hyperlink{bsl}{BSL}-1.1) \cite{terraformDocs}. Esta licencia
+restringe el uso comercial a entidades que compitan directamente con HashiCorp,
+pero no define con precisión qué constituye competencia — lo que genera una zona
+gris legal para cualquier proyecto que construya herramientas de infraestructura
+sobre Terraform.
+
+Como respuesta de la comunidad open source, se creó \textbf{OpenTofu} bajo el
+paraguas de la \textbf{Linux Foundation}, partiendo de la última versión de
+Terraform con licencia MPL-2.0. OpenTofu mantiene compatibilidad con el ecosistema
+Terraform y elimina la ambigüedad legal. Para CloudPorter, que genera y distribuye
+plantillas de infraestructura como parte de su funcionalidad, la elección de
+OpenTofu es la única opción que garantiza libertad de uso sin restricciones.
+
+\subsection{Lenguaje de implementación}
+
+En el plano del lenguaje de implementación, el proyecto se desarrolla íntegramente
+en \textbf{Python}. La elección responde a tres factores: un ecosistema de
+librerías maduro para el procesamiento de YAML y JSON —formatos centrales en
+la especificación de infraestructura—, una amplia disponibilidad de herramientas
+para el desarrollo de interfaces de línea de comandos, y la familiaridad previa
+del autor con el lenguaje, que reduce la fricción en un proyecto de alcance
+acotado. La gestión de dependencias y entornos virtuales se realiza con
+\textbf{uv} \cite{uvDocs}, una herramienta de nueva generación que sustituye
+a pip y poetry con una resolución de dependencias más rápida y resultados
+deterministas.
+
+\subsection{Entorno de desarrollo}
+
+El entorno de desarrollo se define mediante un \hyperlink{devcontainer}{\textbf{devcontainer}} \cite{devcontainerDocs}.
+Esta decisión responde a dos objetivos: mantener las dependencias explícitas y
+versionadas en un único lugar, y eliminar la fricción de configuración para
+cualquier colaborador.
+
+\subsection{Herramientas de calidad}
+
+Las herramientas de calidad no han sido elecciones independientes, sino un ecosistema
+diseñado para automatizar los estándares de mantenibilidad a nivel de commit. 
+Antes de cada commit, \textbf{pre-commit} \cite{precommitDocs} actúa como guardián 
+ejecutando dos comprobaciones: el formateador y linter \textbf{Ruff} \cite{ruffDocs} 
+—que reemplaza la combinación nhabitual de flake8 y black con un rendimiento muy superior— 
+y la verificación estática de tipos con \textbf{mypy} \cite{mypyDocs}. Ambas herramientas
+garantizan que ningún cambio se integra sin cumplir el estándar de formato y
+tipos, proporcionando feedback inmediato sin salir del flujo de trabajo local.
+
+Los tests automáticos se implementan con \textbf{pytest} \cite{pytestDocs}
+siguiendo una estrategia en tres niveles. En pre-push se ejecuta la suite
+completa excluyendo los tests marcados como lentos —aquellos que llaman a
+servicios externos o superan un segundo de ejecución, identificados mediante
+\texttt{@pytest.mark.slow}—, lo que evita subir código roto sin penalizar cada
+commit. En integración continua se ejecuta la suite completa con informe de
+cobertura, con un objetivo mínimo del 80\%.
+
+\subsection{Automatización}
+
+El proyecto adopta una práctica de \hyperlink{cicd}{CI/CD} mediante
+\textbf{GitHub Actions}, que ejecuta los workflows en cada push y pull request.
+El workflow de release se activa al publicar un tag sobre \texttt{main},
+generando y publicando el artefacto de forma automática. Complementariamente, \textbf{Dependabot} \cite{dependabotDocs} automatiza la
+vigilancia de dependencias: analiza el grafo de dependencias del proyecto y abre
+pull requests automáticamente cuando detecta actualizaciones disponibles o
+vulnerabilidades de seguridad, manteniendo el proyecto actualizado sin
+intervención manual.
+
+\Lucas{Completar: añadir detalles de los workflows de GitHub Actions y del resto de GitHub Apps implementadas.}
+
+\subsection{Gestión de la memoria}
+
+La documentación de este TFG se ha redactado con el apoyo de \textbf{Claude Code}
+\cite{claudeCode}. Se configuraron \hyperlink{skill}{\textit{skills}} propias, que encapsulan el estilo 
+de escritura académica y las convenciones LaTeX del documento, y un fichero \texttt{CLAUDE.md} 
+que define el contexto del proyecto y el enfoque narrativo.
+
+\section{Cronograma}
+
+El proyecto se divide en dos fases principales:
+
+\begin{itemize}
+    \item \textbf{Fase de investigación} (febrero–abril de 2026): exploración del
+    dominio, análisis de herramientas existentes, formación en las tecnologías
+    necesarias y definición del alcance. Esta fase culmina con la redacción de
+    los capítulos 1 a 5 de esta memoria.
+
+    \item \textbf{Fase de desarrollo} (abril–junio de 2026): implementación
+    iterativa de CloudPorter siguiendo la metodología descrita, con documentación
+    simultánea en el capítulo~\ref{cap:desarrollo}.
+\end{itemize}
+
+\Lucas{Completar: Insertar diagrama de Gantt con las fases del proyecto e incluirlo como figura aquí.}
+
+\section{Presupuesto}
+
+A continuación se presenta una estimación del coste total del proyecto, calculado
+como si se tratase de un encargo profesional. Se consideran los costes de personal,
+hardware, software, infraestructura cloud, formación y gastos indirectos.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\hline
+\textbf{Concepto} & \textbf{Coste} \\
+\hline
+Personal              & --- \\
+Hardware              & --- \\
+Software              & 0,00 € \\
+Infraestructura cloud & --- \\
+Formación             & 79,31 € \\
+Gastos indirectos     & 250,00 € \\
+\hline
+\textbf{Total}        & --- \\
+\hline
+\end{tabular}
+\caption{Resumen del presupuesto total del proyecto.}
+\label{tab:presupuesto-total}
+\end{table}
+
+\subsection{Personal}
+
+El proyecto ha sido desarrollado por una persona con perfil de ingeniero de
+software junior. Se aplica una tarifa de 16~€/hora, acorde con las tarifas de
+mercado para perfiles junior con especialización técnica en entornos cloud —según
+datos de portales de empleo como InfoJobs e Indeed para el sector tecnológico en
+España—, y considerando la cualificación requerida: diseño de sistemas cloud,
+infraestructura como código y desarrollo de CLI en Python.
+
+El cálculo del coste de personal es:
+
+\[
+\text{Coste total} = \text{horas trabajadas} \times 16~\text{€/hora}
+\]
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrr}
+\hline
+\textbf{Fase} & \textbf{Duración} & \textbf{Horas} & \textbf{Coste} \\
+\hline
+Investigación y documentación & 8 semanas  & --- & --- \\
+Desarrollo e implementación   & 10 semanas & --- & --- \\
+\hline
+\textbf{Total personal}       &            & --- & --- \\
+\hline
+\end{tabular}
+\caption{Coste de personal del proyecto.}
+\label{tab:presupuesto-personal}
+\end{table}
+
+\subsection{Hardware}
+
+\subsection{Software y herramientas}
+
+La totalidad de las herramientas de desarrollo utilizadas en el proyecto son
+de código abierto o tienen licencia gratuita para uso académico:
+\textbf{Python}, \textbf{OpenTofu}, \textbf{GitHub} (plan gratuito),
+\textbf{uv}, \textbf{Ruff}, \textbf{pytest} y \textbf{Claude Code} (uso
+académico), entre otras. El coste asociado a software es por tanto nulo.
+
+\subsection{Infraestructura cloud}
+
+\subsection{Formación}
+
+Como parte del proceso de investigación se realizaron varios cursos y certificaciones
+en las tecnologías utilizadas en el proyecto. Además, se consultaron recursos
+formativos en línea de acceso gratuito —tutoriales, documentación oficial y cursos
+en vídeo-.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\hline
+\textbf{Concepto} & \textbf{Coste} \\
+\hline
+Certificación AWS Cloud Practitioner (certificación) & 50,00 € \\
+Curso AWS Solutions Architect Associate (A. Cantrill) & 29,31 € \\
+Certificación OpenTofu Foundation (Linux Foundation) & 0,00 € \\
+\hline
+\textbf{Total formación} & 79,31 € \\
+\hline
+\end{tabular}
+\caption{Costes de formación.}
+\label{tab:presupuesto-formacion}
+\end{table}
+
+\subsection{Gastos indirectos}
+
+Se incluyen los gastos derivados del uso de recursos básicos durante el período
+de desarrollo. La conexión a internet es necesaria para el acceso a repositorios,
+documentación, servicios cloud y herramientas de integración continua. El consumo
+eléctrico corresponde al equipo de desarrollo en uso durante la jornada de trabajo.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrr}
+\hline
+\textbf{Concepto} & \textbf{Coste mensual} & \textbf{Meses} & \textbf{Total} \\
+\hline
+Conexión a internet & 20,00 € & 5 & 100,00 € \\
+Electricidad        & 30,00 € & 5 & 150,00 € \\
+\hline
+\textbf{Total indirectos} & & & 250,00 € \\
+\hline
+\end{tabular}
+\caption{Gastos indirectos del proyecto.}
+\label{tab:presupuesto-indirectos}
+\end{table}

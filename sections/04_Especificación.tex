@@ -1,0 +1,250 @@
+\chapter{Especificación de requisitos}\label{cap:especificacion}
+
+Este capítulo presenta la especificación de requisitos de CloudPorter en dos niveles.
+En primer lugar se describe la visión completa del sistema — el problema que CloudPorter
+aspira a resolver en su totalidad —, partiendo de una identificación clara de los
+usuarios a los que va dirigida la herramienta. A continuación se delimita el alcance
+del trabajo, distinguiendo los requisitos que se abordan en este TFG de aquellos
+que quedan como líneas de evolución futura.
+
+\section{Usuarios objetivo}
+
+CloudPorter está dirigido a dos perfiles principales que comparten el problema del
+cloud lock-in pero lo experimentan desde ángulos distintos.
+
+El primero es el \textbf{desarrollador o estudiante} que se acerca a la nube
+por primera vez o que trabaja en proyectos personales o de pequeña escala. Para
+este perfil, la barrera principal es el conocimiento: aprender las tecnologías
+específicas de un proveedor supone una inversión de tiempo significativa, y el
+coste de comprometerse con uno sin poder comparar alternativas de forma sencilla
+desincentiva la experimentación.
+
+El segundo es el \textbf{equipo técnico o profesional} que trabaja en entornos
+con infraestructura ya desplegada o en fase de diseño. Para este perfil, el
+problema es organizacional y económico: la elección del proveedor implica estudios
+de costes, dependencias de conocimiento del equipo y dificultad para migrar si
+las condiciones cambian.
+
+\section{Visión del sistema}
+
+CloudPorter se concibe como una herramienta que aborda el cloud lock-in en todas sus
+dimensiones, desde la infraestructura hasta el código, y desde la CLI hasta una
+plataforma de gestión completa. A continuación se describe el sistema en su forma
+más ambiciosa, sin restricciones de alcance.
+
+\subsection{Núcleo de abstracción e infraestructura}
+
+\begin{itemize}
+    \item \textbf{Manifest cloud-agnóstico:} descripción de infraestructura en un
+    formato YAML independiente del proveedor, que cubra cómputo, red, bases de
+    datos, almacenamiento y otros recursos comunes.
+    
+    \item \textbf{Soporte multi-proveedor:} traducción del Manifest a multiples
+    cloud provider — AWS, Azure, GCP, Oracle Cloud, Alibaba Cloud u otros.
+
+    \item \textbf{Generación desde fuentes existentes:} capacidad de partir de
+    un \texttt{docker-compose.yml} o una plantilla \textbf{Terraform} existente y
+    traducirlos automáticamente a un CloudPorter Manifest listo para despliegue.
+
+    \item \textbf{Cobertura de lock-in de código:} integración con herramientas
+    de abstracción a nivel de SDK —como \textbf{MultiCloudJ}— para cubrir
+    también servicios con lock-in de código, como almacenamiento de objetos
+    o colas de mensajes.
+\end{itemize}
+
+\subsection{FinOps y costes}
+
+\begin{itemize}
+    \item \textbf{Estimación comparativa previa al despliegue:} cálculo del
+    coste aproximado de una arquitectura en distintos proveedores antes de
+    ejecutar el despliegue, con recomendaciones de optimización.
+
+    \item \textbf{Monitorización del gasto:} visibilidad del gasto cloud en
+    tiempo real, detección de recursos huérfanos y alertas de desviación
+    presupuestaria.
+\end{itemize}
+
+\subsection{Seguridad}
+
+\begin{itemize}
+    \item \textbf{Análisis de la infraestructura generada:} integración con
+    herramientas de análisis estático de IaC para detectar configuraciones
+    inseguras —permisos excesivos, puertos expuestos— antes del despliegue.
+
+    \item \textbf{Auditoría continua:} integración con herramientas de auditoría
+    de seguridad cloud para la verificación continua del cumplimiento normativo.
+\end{itemize}
+
+\subsection{Interfaz y experiencia de usuario}
+
+\begin{itemize}
+    \item \textbf{CLI:} interfaz de línea de comandos como punto de entrada
+    principal, accesible sin conocimiento previo de los proveedores.
+
+    \item \textbf{Plataforma web:} interfaz gráfica para gestión visual de la
+    infraestructura, con diagramas de arquitectura interactivos y paneles
+    de monitorización, sistemas de métricas y alertas.
+
+    \item \textbf{Integración con agentes externos:} exposición de las
+    funcionalidades de CloudPorter como herramientas invocables por agentes
+    de IA mediante el protocolo \hyperlink{mcp}{\textbf{MCP}} (\textit{Model Context Protocol})
+    \cite{mcpDocs}, de forma que un modelo de lenguaje pueda operar la
+    herramienta de forma autónoma.
+\end{itemize}
+
+\subsection{Componente agéntico}
+
+\begin{itemize}
+    \item \textbf{Asistente en lenguaje natural:} componente que permite
+    interactuar con CloudPorter mediante lenguaje natural, asistiendo al
+    usuario tanto en la generación del Manifest como en el uso general
+    de la herramienta.
+
+    \item \textbf{Base de conocimiento contextual:} sistema de recuperación
+    aumentada de información (\textit{Retrieval-Augmented Generation}, \hyperlink{rag}{RAG}) que
+    permite enriquecer al agente con documentación propia — diagramas, diseños
+    técnicos, decisiones de arquitectura — para obtener sugerencias adaptadas
+    al contexto real del proyecto.
+
+    \item \textbf{Sugerencias de optimización:} recomendaciones de costes,
+    arquitectura y seguridad generadas por el agente a partir del contexto
+    del despliegue y la base de conocimiento.
+
+    \item \textbf{Capa determinista final:} independientemente del componente
+    de IA utilizado, toda infraestructura generada pasa por una capa de
+    validación y traducción determinista antes del despliegue, garantizando
+    resultados predecibles y auditables.
+
+\end{itemize}
+
+\section{Alcance de este trabajo}
+
+El sistema descrito en la sección anterior representa la visión completa y ambiciosa de CloudPorter.
+Dado el alcance de un Trabajo de Fin de Grado, se define un subconjunto acotado
+de requisitos suficiente para demostrar la viabilidad del enfoque y aportar valor
+real, sin comprometer la calidad de lo que se construye.
+
+\section{Requisitos funcionales}
+
+Los siguientes requisitos funcionales definen el comportamiento del sistema en
+su versión inicial. Se presentan agrupados por área funcional.
+
+\subsection{Manifest y traducción}
+
+\begin{itemize}
+    \item \textbf{RF-01.} El sistema debe permitir definir infraestructura mediante
+    un fichero YAML con un formato propio independiente del proveedor cloud.
+
+    \item \textbf{RF-02.} El sistema debe validar el Manifest antes de procesarlo,
+    informando de errores de sintaxis o valores no soportados.
+
+    \item \textbf{RF-03.} El sistema debe traducir el Manifest a plantillas
+    \textbf{OpenTofu} desplegables en \textbf{AWS} y \textbf{Microsoft Azure}
+    —la elección de ambas plataformas y la preferencia por OpenTofu sobre
+    Terraform se justifican en el capítulo~\ref{cap:planificacion}.
+
+    \item \textbf{RF-04.} El sistema debe soportar los siguientes tipos de
+    recursos en la traducción: instancias de cómputo, bases de datos relacionales
+    y configuración de red —generada automáticamente, sin requerir declaración
+    explícita del usuario.
+
+    \item \textbf{RF-05.} El sistema debe resolver automáticamente las equivalencias
+    entre recursos genéricos del Manifest y los servicios específicos de cada
+    proveedor mediante un \hyperlink{mapper}{mapper} determinista.
+\end{itemize}
+
+\subsection{Despliegue}
+
+\begin{itemize}
+    \item \textbf{RF-06.} El sistema debe ejecutar el despliegue de la
+    infraestructura traducida en el proveedor seleccionado por el usuario.
+
+    \item \textbf{RF-07.} El sistema debe informar del estado del despliegue
+    y de los recursos creados una vez completado.
+\end{itemize}
+
+\subsection{FinOps}
+
+\begin{itemize}
+    \item \textbf{RF-08.} El sistema debe estimar el coste mensual aproximado
+    de desplegar la arquitectura definida en el Manifest para cada proveedor
+    soportado.
+
+    \item \textbf{RF-09.} El sistema debe presentar la comparativa de costes
+    entre proveedores antes de ejecutar el despliegue, permitiendo al usuario
+    tomar una decisión informada.
+\end{itemize}
+
+\subsection{Interfaz de línea de comandos}
+
+\begin{itemize}
+    \item \textbf{RF-10.} El sistema debe exponer su funcionalidad a través de
+    una CLI que permita, como mínimo: validar un Manifest, estimar costes y
+    ejecutar un despliegue.
+\end{itemize}
+
+\subsection{Seguridad}
+
+\begin{itemize}
+    \item \textbf{RF-11.} El sistema debe analizar las plantillas generadas
+    mediante herramientas de análisis estático de IaC antes del despliegue,
+    detectando configuraciones inseguras e informando al usuario.
+\end{itemize}
+
+\section{Requisitos no funcionales}
+
+\begin{itemize}
+    \item \textbf{RNF-01. Determinismo:} dado un mismo Manifest y un mismo
+    proveedor, el sistema debe generar siempre la misma plantilla de
+    infraestructura, garantizando resultados reproducibles y auditables.
+
+    \item \textbf{RNF-02. Extensibilidad:} la arquitectura del sistema debe
+    permitir añadir soporte a nuevos proveedores cloud sin modificar el núcleo
+    de la herramienta.
+
+    \item \textbf{RNF-03. Usabilidad:} el sistema debe poder utilizarse sin
+    conocimiento previo de los servicios específicos de AWS o Azure — el usuario
+    opera en términos del Manifest, no del proveedor.
+
+    \item \textbf{RNF-04. Trazabilidad:} el sistema debe exponer las plantillas
+    generadas antes de ejecutar el despliegue, de forma que el usuario pueda
+    revisarlas y auditarlas.
+
+    \item \textbf{RNF-05. Mantenibilidad:} la arquitectura interna del sistema
+    debe facilitar la incorporación de nuevos tipos de recursos y la corrección
+    de equivalencias entre proveedores, sin requerir cambios transversales en el
+    código. Cada proveedor y cada tipo de recurso deben poder modificarse de forma
+    independiente.
+\end{itemize}
+
+\section{Líneas de evolución futura}
+
+Los siguientes aspectos quedan explícitamente fuera del alcance de este trabajo
+y se identifican como líneas de evolución futura:
+
+\begin{itemize}
+    \item Soporte a proveedores adicionales: \textbf{Google Cloud Platform},
+    Oracle Cloud, Alibaba Cloud y otros.
+
+    \item Generación de Manifest desde \texttt{docker-compose.yml} u otras
+    fuentes de definición de entornos locales.
+
+    \item Interfaz web con gestión visual de infraestructura, diagramas
+    de arquitectura interactivos y paneles de monitorización.
+
+    \item Componente agéntico: asistente en lenguaje natural, integración
+    con agentes externos mediante MCP y sugerencias de optimización
+    basadas en el contexto del despliegue.
+
+    \item Monitorización del gasto cloud y detección de cloud sprawl en
+    infraestructura ya desplegada.
+    
+    \item Gestión de estado propia de CloudPorter: seguimiento de manifests
+    desplegados, proveedor y versión, con almacén embebido o backend remoto
+    para entornos multi-usuario.
+
+    \item Cobertura de lock-in de código: integración con herramientas de
+    abstracción a nivel de SDK para cubrir servicios con dependencia a nivel
+    de código.
+
+\end{itemize}

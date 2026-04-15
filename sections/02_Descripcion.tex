@@ -1,0 +1,146 @@
+\chapter{Descripción del problema}\label{cap:descripcion}
+
+La computación en la nube ha transformado la forma en que se despliega y gestiona
+la infraestructura tecnológica, ofreciendo acceso bajo demanda a recursos de cómputo,
+almacenamiento y red sin necesidad de inversión en hardware propio. Sin embargo,
+detrás de esta promesa de flexibilidad subyace un problema estructural que condiciona
+profundamente las decisiones de quienes adoptan estos servicios: el \textbf{cloud
+lock-in}. Este capítulo analiza dicho problema en su dimensión completa, presenta
+la solución propuesta y delimita el alcance de este trabajo.
+
+\section{Contexto y problemática}
+
+La adopción de servicios cloud ha crecido de forma sostenida durante la última
+década. Según el informe anual de Flexera sobre el estado de la nube
+\cite{flexera2026}, el 73\% de las organizaciones encuestadas operan en entornos
+híbridos o multi-cloud, lo que refleja tanto la madurez del mercado como la
+creciente conciencia sobre los riesgos de depender de un único proveedor. Sin
+embargo, este dato contrasta con la dificultad real que supone mover cargas de
+trabajo entre plataformas una vez que se ha iniciado el despliegue.
+
+El \textbf{cloud lock-in} —o dependencia del proveedor cloud— se produce cuando
+una organización o individuo queda vinculado a una plataforma concreta de forma
+que migrar a otra resulta técnicamente complejo, económicamente costoso o
+ambas cosas a la vez. Esta dependencia no es accidental: los proveedores ofrecen
+servicios gestionados, integraciones nativas y modelos de precios que incentivan
+el uso de sus propias herramientas, generando un ecosistema difícil de abandonar.
+
+El problema se manifiesta en tres dimensiones que se refuerzan mutuamente:
+
+\begin{itemize}
+    \item \textbf{Lock-in de infraestructura:} los recursos desplegados en un
+    proveedor —instancias de cómputo, bases de datos gestionadas, configuraciones
+    de red— utilizan servicios, nomenclaturas y modelos de configuración específicos
+    de esa plataforma. Migrar una arquitectura de \textbf{AWS} a
+    \textbf{Microsoft Azure}, por ejemplo, no es una cuestión de exportar y
+    reimportar configuraciones: requiere rediseñar los recursos en los términos
+    propios del proveedor destino.
+
+    \item \textbf{Lock-in de conocimiento:} aunque los conceptos fundamentales
+    de la computación en la nube son transferibles entre plataformas, las
+    tecnologías concretas no lo son. Un profesional formado en AWS —familiarizado
+    con \textbf{EC2}, \textbf{RDS} o \textbf{VPC}— debe afrontar un proceso de
+    reaprendizaje significativo para operar con los servicios equivalentes de Azure
+    o \textbf{Google Cloud Platform (GCP)}. Este coste de conocimiento desincentiva
+    la exploración de alternativas y consolida la dependencia.
+
+    \item \textbf{Lock-in económico:} la estimación de costes cloud es opaca y
+    compleja. Aunque los proveedores ofrecen calculadoras de precios, su uso
+    requiere conocimiento previo de los servicios a contratar y criterio suficiente
+    para modelar correctamente el escenario de despliegue. Comparar el coste de
+    una misma arquitectura en distintos proveedores exige dominar simultáneamente
+    los modelos de precios de cada uno —tarea que en la práctica recae en
+    especialistas o empresas externas \cite{flexera2026}.
+\end{itemize}
+
+A estas tres dimensiones se añade la \textbf{complejidad de seguridad} inherente
+a la nube. Todos los proveedores cloud operan bajo un modelo de
+\hyperlink{shared-responsibility}{\textbf{responsabilidad compartida}}: el proveedor garantiza la seguridad de la
+infraestructura subyacente, pero la seguridad de lo que el usuario despliega sobre
+ella —configuración de permisos, exposición de puertos, cifrado de datos— es
+responsabilidad exclusiva de quien gestiona los recursos \cite{awsSharedResponsibility}.
+Este modelo, combinado con la curva de aprendizaje de cada plataforma, genera un
+riesgo adicional para equipos con experiencia limitada en la nube.
+
+\section{Magnitud del problema}
+
+El impacto del cloud lock-in no se limita a la dificultad técnica de una migración
+puntual. Sus consecuencias afectan a la capacidad de negociación, a la eficiencia
+operativa y a la sostenibilidad económica de proyectos de cualquier escala.
+
+En el ámbito económico, el sobrecoste por uso ineficiente o no planificado de
+recursos cloud es un problema extendido. El mismo informe de Flexera
+\cite{flexera2026} estima que las organizaciones desperdician de media un 29\%
+de su gasto cloud, en gran parte por falta de visibilidad y herramientas de
+control adecuadas. La ausencia de mecanismos que permitan comparar costes entre
+proveedores antes de comprometerse con uno agrava esta situación: la elección
+del proveedor se realiza frecuentemente por familiaridad o inercia, no por
+criterio económico fundamentado.
+
+En el ámbito organizacional, la dependencia de un proveedor limita la capacidad
+de respuesta ante cambios de precios, interrupciones de servicio o evoluciones
+del mercado. Empresas que han centralizado su infraestructura en un único cloud
+se encuentran en una posición negociadora débil y asumen el riesgo de que
+decisiones unilaterales del proveedor —cambios de tarifas, discontinuación de
+servicios— afecten directamente a su operativa.
+
+\section{Solución propuesta}
+
+Frente a este problema, se propone \textbf{CloudPorter}: una herramienta de línea de
+comandos que permite describir infraestructura cloud de forma agnóstica al
+proveedor y desplegarla en distintas plataformas a partir de una única definición.
+
+El núcleo de CloudPorter es el \hyperlink{cloudporter-manifest}{\textbf{CloudPorter Manifest}}, un fichero en formato
+\textbf{YAML} que describe los recursos de infraestructura en términos genéricos, independientes de cualquier proveedor. A partir
+de este manifiesto, CloudPorter traduce la definición a las plantillas de infraestructura
+como código propias de cada plataforma, abstrayendo al usuario de los detalles
+específicos de cada cloud.
+
+Además de la traducción y el despliegue, CloudPorter incorpora la posibilidad de estimación
+de costes que permite comparar el coste aproximado de una arquitectura en distintos
+proveedores antes de ejecutar el despliegue. De este modo, la elección del proveedor
+puede fundamentarse en criterios económicos objetivos, reduciendo la opacidad que
+caracteriza hoy a este proceso.
+
+\section{Alcance y restricciones}
+
+El problema del cloud lock-in es amplio y sus dimensiones abarcan aspectos que van
+más allá de lo abordable en el marco de un único trabajo. Por ello, se establece
+explícitamente qué entra en el alcance de este TFG y qué queda como trabajo futuro.
+
+En el \textbf{alcance del trabajo} se incluye:
+
+\begin{itemize}
+    \item \textbf{Soporte a dos proveedores cloud:} AWS y Microsoft Azure como
+    plataformas de despliegue objetivo en la versión inicial de CloudPorter.
+
+    \item \textbf{Recursos de infraestructura básicos:} cómputo, configuración
+    de red —generada automáticamente, sin requerir declaración explícita del
+    usuario— y bases de datos relacionales.
+
+    \item \textbf{Estimación comparativa de costes:} módulo que permite comparar
+    el coste aproximado de un despliegue entre los proveedores soportados.
+
+    \item \textbf{Interfaz de línea de comandos:} como interfaz principal de
+    interacción con la herramienta.
+\end{itemize}
+
+Quedan \textbf{fuera del alcance} de este trabajo:
+
+\begin{itemize}
+    \item \textbf{Soporte a Google Cloud Platform} y otros proveedores: el soporte
+    a dos clouds es suficiente para demostrar la viabilidad del enfoque agnóstico.
+
+    \item \textbf{Almacenamiento de objetos:} los servicios de almacenamiento
+    —como \textbf{AWS S3} o \textbf{Azure Blob Storage}— implican lock-in a nivel
+    de código, no solo de infraestructura, lo que excede el alcance de este trabajo.
+
+    \item \textbf{Análisis de seguridad avanzado:} aunque se reconoce la
+    complejidad del modelo de responsabilidad compartida, su abordaje requiere
+    un modelado de políticas específico por proveedor que excede el alcance de
+    este trabajo.
+
+    \item \textbf{Interfaz web o plataforma:} la CLI es suficiente para validar
+    el núcleo de la herramienta; una interfaz gráfica no aporta evidencia adicional
+    sobre la viabilidad del enfoque.
+\end{itemize}

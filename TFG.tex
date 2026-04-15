@@ -1,0 +1,72 @@
+\documentclass[12pt]{report}
+
+% Paquetes LaTeX y estilos globales
+\input{etc/pkgs}
+\input{etc/style}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Variables para la portada
+\setTitle{CloudPorter}
+\setAuthor{Lucas López Aránega}
+\setDegree{Grado en Ingeniería Informática}
+\setSupervisor{Juan Luis Jiménez Laredo}
+\setDepartment{Departamento de Ingeniería de Computadores, Automática y Robótica}
+\setMonth{Junio}
+\setYear{2025/26}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Dedicatoria del trabajo
+% Si no se desea incluir, comentar o borrar la línea siguiente para eliminar la página de dedicatoria
+\setDedication{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Comienzo del documento
+\begin{document}
+
+% Portada y secciones no numeradas
+\input{sections/00_portada}
+\input{sections/00_agradecimientos}
+\newpage
+\thispagestyle{empty}
+\null
+\newpage
+\input{sections/00_resumen}
+\input{sections/00_abstract}
+
+% Índice del documento y de figuras
+\begingroup
+% Los enlaces son normalmente azules, pero en los índices se configuran a negro para que no aparezca todo azul
+\hypersetup{linkcolor=black}
+\tableofcontents
+\listoffigures
+\listoftables
+\endgroup
+
+% Cambia el estilo de números de página de romanos a normal
+\clearpage\pagenumbering{arabic}
+
+% Capítulos del trabajo
+\input{sections/01_Introduccion}
+\input{sections/02_Descripcion}
+\input{sections/03_Estado}
+\input{sections/04_Especificación}
+
+\input{sections/05_Planificacion}
+\input{sections/06_Desarrollo}
+\input{sections/07_Evaluacion}
+
+\input{sections/08_Conclusiones}
+
+% Anexos
+\input{sections/ANX_Glosario.tex}
+
+% Bibliografía
+\bibliographystyle{unsrtnat}
+\bibliography{bibliografia.bib}
+\Lucas{Completar: Revisar las fechas de acceso de todas las entradas de la bibliografia antes de la entrega.}
+
+% Fin del documento
+\end{document}

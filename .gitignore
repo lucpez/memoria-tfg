@@ -1,0 +1,22 @@
+# Archivos de compilación intermedios de LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.idx
+*.ind
+*.lof
+*.lot
+*.out
+*.toc
+*.run.xml
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+*.synctex(busy)
+
+# Archivos auto-generados
+*.glsdefs
+*.lol
+*.pdf

@@ -1,0 +1,55 @@
+\thispagestyle{empty} % Impide que se incluya número de página en la portada
+\begin{center}
+
+\includegraphics[width=\textwidth]{figures/ugr2.png}
+
+\vspace*{1cm}
+\begin{large}
+TRABAJO FIN DE GRADO
+\end{large}
+
+\vspace*{0.5cm}
+\textbf{\LARGE \tfgTitle} 
+\vspace*{0.5cm}
+
+{\large Realizado por}\\
+\textbf{\Large \tfgAuthors}
+
+\vspace*{.1in}
+
+\noindent\rule[-1ex]{\textwidth}{3pt}\\[3.5ex]
+
+\includegraphics[width=7cm]{figures/etsiit-horizontal-color-bi.png}
+
+\textbf{Para la obtención del título de}\\
+{\large \tfgDegree}
+
+\vspace*{0.2in}
+
+\textbf{Dirigido por}\\
+{\large \tfgSupervisor}\\
+
+\vspace*{0.3in}
+
+\textbf{En el departamento de}\\ 
+{\large \tfgDepartment}
+
+\vspace*{.2in}
+\textbf{\Large Convocatoria de \tfgMonth, curso \tfgYear}
+
+\end{center}
+
+% Dedicatoria
+\ifdefined\tfgDedication
+    \newpage
+    \thispagestyle{empty}
+    
+    \vspace*{\fill}
+    \begin{center}
+    \textit{\tfgDedication}
+    \end{center}
+    \vspace*{\fill}
+\fi
+
+\clearpage\setcounter{page}{1} % Comienza a incluir números de página a partir de aquí
+\pagenumbering{roman} % En números romanos

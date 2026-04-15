@@ -1,0 +1,39 @@
+{
+    "name": "TFG LaTeX",
+    "image": "texlive/texlive:latest",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "james-yu.latex-workshop"
+            ],
+            "settings": {
+                "latex-workshop.latex.tools": [
+                    {
+                        "name": "latexmk",
+                        "command": "latexmk",
+                        "args": [
+                            "-pdf",
+                            "-interaction=nonstopmode",
+                            "-halt-on-error",
+                            "-synctex=1",
+                            "%DOC%"
+                        ]
+                    }
+                ],
+                "latex-workshop.latex.recipes": [
+                    {
+                        "name": "latexmk",
+                        "tools": ["latexmk"]
+                    }
+                ],
+                "latex-workshop.view.pdf.viewer": "tab",
+                "latex-workshop.latex.autoBuild.run": "onSave",
+                "latex-workshop.formatting.latex": "latexindent",
+                "editor.wordWrap": "on",
+                "[latex]": {
+                    "editor.formatOnSave": true
+                }
+            }
+        }
+    }
+}

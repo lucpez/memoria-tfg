@@ -1,0 +1,90 @@
+\chapter*{Anexo: Glosario}
+\addcontentsline{toc}{chapter}{Anexo: Glosario}
+
+% TODO: Añadir entradas del glosario con \hypertarget según se vayan
+% definiendo términos a lo largo del documento.
+
+\begin{description}
+
+    \item [\hypertarget{bsl}{\textbf{BSL}} (Business Source License)]
+    Licencia de software introducida por HashiCorp en 2023 para Terraform. A
+    diferencia de las licencias open source, restringe el uso comercial a entidades
+    que compitan directamente con el titular de la licencia. Su ambigüedad en la
+    definición de «competidor» motivó la creación de OpenTofu como alternativa
+    plenamente open source.
+
+    \item [\hypertarget{cicd}{\textbf{CI/CD}} (Continuous Integration / Continuous Delivery)]
+    Práctica de desarrollo que automatiza la verificación y entrega del software.
+    La integración continua (CI) ejecuta checks de calidad —tests, linting,
+    cobertura— en cada cambio integrado al repositorio. La entrega continua (CD)
+    automatiza la publicación de artefactos o despliegues cuando el código supera
+    esas verificaciones.
+
+    \item [\hypertarget{devcontainer}{\textbf{Devcontainer}}]
+    Especificación abierta que define un entorno de desarrollo reproducible mediante
+    contenedores. Encapsula las dependencias, herramientas y configuración necesarias
+    para trabajar en un proyecto, de forma que cualquier colaborador obtenga un
+    entorno idéntico independientemente de su sistema operativo o configuración local.
+
+    \item [\hypertarget{cloud-sprawl}{\textbf{Cloud sprawl}}]
+    Proliferación descontrolada de recursos cloud —instancias, bases de datos,
+    entornos de desarrollo olvidados— que no están siendo utilizados o monitorizados
+    activamente. Genera costes innecesarios y dificulta la gobernanza de la
+    infraestructura.
+
+    \item [\hypertarget{finops}{\textbf{FinOps}} (Financial Operations)]
+    Disciplina de gestión financiera aplicada al gasto en infraestructura cloud.
+    Su objetivo es proporcionar visibilidad sobre los costes, optimizar el uso de
+    recursos y alinear el gasto cloud con el valor de negocio generado.
+
+    \item [\hypertarget{iac}{\textbf{IaC}} (Infrastructure as Code)]
+    Paradigma de gestión de infraestructura que consiste en definir y provisionar
+    recursos mediante ficheros de configuración versionables, en lugar de a través
+    de procesos manuales o consolas gráficas.
+
+    \item [\hypertarget{mcp}{\textbf{MCP}} (Model Context Protocol)]
+    Protocolo abierto desarrollado por Anthropic que estandariza la forma en que
+    los modelos de lenguaje se conectan con herramientas y fuentes de datos externas.
+    Permite que un agente de IA invoque funcionalidades de aplicaciones externas
+    de forma estructurada y segura.
+
+    \item [\hypertarget{mapper}{\textbf{Mapper}}]
+    Componente interno de CloudPorter responsable de resolver las equivalencias entre
+    los recursos genéricos definidos en el CloudPorter Manifest y los servicios
+    específicos de cada proveedor cloud. Opera de forma determinista: dado un
+    recurso y un proveedor, produce siempre la misma traducción.
+
+    \item [\hypertarget{paas}{\textbf{PaaS}} (Platform as a Service)]
+    Modelo de servicio cloud en el que el proveedor gestiona la infraestructura
+    subyacente y expone al usuario una plataforma para desplegar aplicaciones sin
+    necesidad de configurar ni administrar servidores, redes o sistemas operativos.
+
+    \item [\hypertarget{cloudporter-manifest}{\textbf{CloudPorter Manifest}}]
+    Fichero en formato YAML que describe la infraestructura de un proyecto de
+    forma agnóstica al proveedor cloud. Define recursos de cómputo, red y base de
+    datos en términos genéricos que CloudPorter traduce a las plantillas específicas
+    de cada plataforma soportada.
+
+    \item [\hypertarget{rag}{\textbf{RAG}} (Retrieval-Augmented Generation)]
+    Técnica de inteligencia artificial que combina la generación de texto mediante
+    modelos de lenguaje con la recuperación de información de una base de
+    conocimiento externa. Permite que el modelo produzca respuestas contextualizadas
+    con información específica del dominio, más allá de lo aprendido durante su
+    entrenamiento.
+
+    \item [\hypertarget{shared-responsibility}{\textbf{Shared Responsibility Model}}]
+    Modelo de seguridad cloud en el que las responsabilidades se dividen entre el
+    proveedor y el usuario. El proveedor garantiza la seguridad de la infraestructura
+    subyacente; el usuario es responsable de la seguridad de lo que despliega sobre
+    ella —configuración de permisos, cifrado de datos, exposición de puertos.
+
+    \item [\hypertarget{skill}{\textbf{Skill}}]
+    Comando personalizado de \textbf{Claude Code} que encapsula un flujo de trabajo
+    o un conjunto de instrucciones de comportamiento. Las skills se invocan mediante
+    una barra oblicua seguida del nombre del comando (\texttt{/nombre}) y permiten
+    extender el asistente con comportamientos específicos del proyecto —como el
+    estilo de redacción académica o la compilación del documento.
+
+\end{description}
+
+\endinput
