@@ -6,7 +6,9 @@ infraestructura. Sin embargo, detrás de la aparente simplicidad que los proveed
 cloud prometen, subyace un conjunto de complejidades técnicas, económicas y
 organizacionales que condicionan profundamente las decisiones de quienes trabajan
 con estas tecnologías. Este capítulo presenta la motivación que da origen a este
-trabajo, los objetivos que se persiguen y la estructura que sigue la memoria.
+trabajo, los objetivos que se persiguen, la estructura que sigue la memoria y
+una declaración explícita sobre el uso de herramientas de inteligencia artificial
+durante su elaboración.
 
 \section{Motivación}
 
@@ -111,3 +113,88 @@ obtenidos y las líneas de trabajo futuro.
     recoge los aprendizajes obtenidos, el alcance alcanzado y las líneas de
     desarrollo futuro que quedan abiertas.
 \end{itemize}
+
+\section{Uso de inteligencia artificial}
+
+Durante la elaboración de este Trabajo Fin de Grado se ha recurrido a herramientas de
+\textbf{inteligencia artificial (IA)} generativa como apoyo en dos ámbitos diferenciados:
+el desarrollo del software CloudPorter y la redacción de la presente memoria. A continuación
+se detallan las herramientas utilizadas, los usos concretos realizados y los mecanismos de
+validación empleados para garantizar la corrección y coherencia del trabajo entregado.
+
+\subsection{Herramientas utilizadas}
+
+La única herramienta de IA empleada a lo largo del proyecto ha sido \textbf{Claude Code}
+\cite{claudeCode}, un agente de programación e interacción en lenguaje natural desarrollado
+por Anthropic, que opera desde la línea de comandos y tiene acceso al repositorio y al
+entorno de desarrollo local.
+
+\subsection{Usos realizados}
+
+\subsubsection*{Apoyo al desarrollo de CloudPorter}
+
+Claude Code se empleó como asistente de programación durante el ciclo de desarrollo iterativo
+descrito en el capítulo~\ref{cap:desarrollo}. Los usos concretos incluyeron:
+
+\begin{itemize}
+    \item \textbf{Generación y revisión de código:} implementación de módulos del traductor,
+    plantillas Jinja2 y la lógica del mapper determinístico, revisados y validados por el
+    autor antes de cada integración.
+    \item \textbf{Skills de flujo de trabajo:} se desarrollaron dos skills propias para
+    Claude Code —\texttt{create-issue} y \texttt{github-workflow}— que encapsulan las
+    convenciones del proyecto y asisten en la creación de issues y la revisión de workflows
+    de GitHub Actions.
+    \item \textbf{Reglas de contexto:} se configuró un fichero de reglas específico para
+    el módulo de traducción (\texttt{.claude/rules/translator.md}) que documenta las
+    convenciones de estructura del traductor y orienta al agente cuando trabaja en esa
+    parte del código.
+    \item \textbf{Apoyo en depuración y diseño:} consultas sobre decisiones de arquitectura,
+    resolución de errores en la suite de tests y revisión de pull requests.
+\end{itemize}
+
+En todos los casos, el código generado fue revisado, adaptado y validado por el autor
+mediante la suite de tests automatizados del proyecto —con un umbral mínimo de cobertura
+del 80\%— y mediante la ejecución manual de los flujos de despliegue sobre AWS y Azure.
+
+\subsubsection*{Apoyo a la redacción de la memoria}
+
+Claude Code se utilizó como asistente de escritura académica para la redacción y revisión
+de los capítulos de esta memoria. Los usos concretos incluyeron:
+
+\begin{itemize}
+    \item \textbf{Redacción de secciones:} generación de borradores de capítulos a partir
+    de indicaciones del autor, respetando el enfoque narrativo del TFG y las convenciones
+    de estilo definidas.
+    \item \textbf{Revisión lingüística y de estilo:} corrección de coherencia, fluidez y
+    adecuación al registro académico en castellano.
+    \item \textbf{Skill de redacción:} se configuró una skill propia (\texttt{escritura-tfg})
+    que encapsula las convenciones de voz, estructura y estilo propias de esta memoria,
+    asegurando consistencia entre sesiones de trabajo.
+    \item \textbf{Contexto persistente:} se mantiene un fichero \texttt{CLAUDE.md} con el
+    enfoque narrativo del TFG, la estructura de capítulos y las instrucciones de redacción,
+    que se carga automáticamente en cada sesión de trabajo con el agente.
+\end{itemize}
+
+Todo el contenido generado ha sido revisado críticamente por el autor, que ha verificado
+la corrección técnica de las afirmaciones, la coherencia con el resto del documento y
+la adecuación a los requisitos académicos. Las decisiones de contenido —qué incluir,
+qué omitir, cómo enmarcar cada argumento— son en todo momento responsabilidad del autor.
+
+\subsection{Validación}
+
+Los mecanismos de validación empleados para garantizar la calidad del trabajo son los
+siguientes:
+
+\begin{itemize}
+    \item \textbf{Código:} suite de tests automatizados con cobertura mínima del 80\%,
+    comprobaciones de tipos con mypy, análisis estático con Ruff y validación funcional
+    mediante despliegue real en AWS y Azure.
+    \item \textbf{Memoria:} revisión manual de cada sección generada, contraste de datos
+    técnicos con la documentación oficial de las herramientas y fuentes bibliográficas
+    citadas, y compilación continua del documento LaTeX para verificar su integridad formal.
+\end{itemize}
+
+\subsection{Periodo de uso}
+
+Las herramientas de IA descritas se emplearon durante todo el período de desarrollo e
+implementación del proyecto, comprendido entre febrero y mayo de 2026.
