@@ -53,10 +53,11 @@ con el repositorio del código. Cada unidad de trabajo se representa como un
 hasta su cierre. Las columnas del tablero son:
 
 \begin{enumerate}
-    \item \textbf{Backlog:} ideas y tareas pendientes de priorizar.
-    \item \textbf{En curso:} tarea actualmente en desarrollo.
-    \item \textbf{En revisión:} pull request abierto pendiente de revisión.
-    \item \textbf{Hecho:} tarea completada y mergeada.
+    \item \textbf{Backlog:} ideas y tareas identificadas, pendientes de priorizar.
+    \item \textbf{Ready:} tarea priorizada y lista para ser iniciada.
+    \item \textbf{In progress:} tarea en desarrollo activo.
+    \item \textbf{In review:} pull request abierto, pendiente de revisión y checks de CI.
+    \item \textbf{Done:} tarea completada y mergeada en \texttt{main}.
 \end{enumerate}
 
 Cada issue da lugar a una rama de trabajo con el esquema
@@ -167,15 +168,31 @@ cobertura, con un objetivo mínimo del 80\%.
 \subsection{Automatización}
 
 El proyecto adopta una práctica de \hyperlink{cicd}{CI/CD} mediante
-\textbf{GitHub Actions}, que ejecuta los workflows en cada push y pull request.
-El workflow de release se activa al publicar un tag sobre \texttt{main},
-generando y publicando el artefacto de forma automática. Complementariamente, \textbf{Dependabot} \cite{dependabotDocs} automatiza la
-vigilancia de dependencias: analiza el grafo de dependencias del proyecto y abre
-pull requests automáticamente cuando detecta actualizaciones disponibles o
-vulnerabilidades de seguridad, manteniendo el proyecto actualizado sin
-intervención manual.
+\textbf{GitHub Actions}, que ejecuta los workflows necesarios en cada push,
+pull request o publicación de tag. Se han configurado cuatro workflows:
 
-\Lucas{Completar: añadir detalles de los workflows de GitHub Actions y del resto de GitHub Apps implementadas.}
+\begin{itemize}
+    \item \textbf{CI} (\texttt{ci.yml}): se ejecuta en cada push y pull request
+    sobre \texttt{main}. Instala dependencias con uv, ejecuta Ruff, mypy y
+    pytest con informe de cobertura. En pull requests, publica automáticamente
+    un comentario con el resumen de cobertura mediante
+    \texttt{python-coverage-comment-action}.
+
+    \item \textbf{PR Conventions} (\texttt{pr-conventions.yml}): verifica que
+    el título de cada pull request sigue la especificación Conventional Commits,
+    rechazando la integración si no cumple el formato.
+
+    \item \textbf{Sync PR from issue} (\texttt{sync-pr-from-issue.yml}): al
+    abrir un pull request, extrae el número de issue del nombre de la rama,
+    copia sus etiquetas al PR y añade automáticamente la referencia
+    \texttt{Closes \#N} al cuerpo del PR para garantizar el cierre automático
+    del issue al hacer merge.
+
+    \item \textbf{Release} (\texttt{release.yml}): se activa al publicar un
+    tag con formato \texttt{v*.*.*} sobre \texttt{main}. Construye el paquete
+    con \texttt{uv build} y crea una GitHub Release con los artefactos
+    adjuntos y las notas de cambios generadas automáticamente.
+\end{itemize}
 
 \subsection{Gestión de la memoria}
 
