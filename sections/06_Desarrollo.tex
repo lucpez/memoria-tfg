@@ -9,10 +9,15 @@ de longitud fija— permite que el ritmo de avance se adapte a la naturaleza exp
 trabajo: cuando emerge una decisión de diseño compleja o aparece un obstáculo técnico imprevisto,
 el ciclo se alarga sin forzar cierres artificiales.
 
-El desarrollo se inicia el 29 de abril de 2026 y abarca hasta el 17 de mayo, con un total de
-veintitrés issues abiertos en el repositorio —veintidós cerrados y uno en curso al cierre de
-este documento— y veintidós \textit{pull requests} mergeados. A continuación se detallan cada
-una de las iteraciones, su justificación y los aprendizajes que dejaron.
+El desarrollo se inicia el 29 de abril de 2026 y abarca hasta el 17 de mayo, con cinco issues
+de feature cerrados —los ejes de las cuatro iteraciones— y veintidós \textit{pull requests}
+mergeados en total. No todos los PRs tienen un issue asociado: los cambios menores
+—añadir una skill de Claude Code, actualizar el devcontainer, ajustar la configuración de
+CI— se integraron directamente sin abrir un issue formal, dado que no requieren un ciclo
+de diseño. Esos cambios se mencionan en el contexto de la iteración donde tienen sentido,
+pero el hilo conductor de cada sección es siempre el issue de feature que la motiva.
+A continuación se detallan cada una de las iteraciones, su justificación y los aprendizajes
+que dejaron.
 
 % ---------------------------------------------------------------------------
 \section{Iteración 1 — Infraestructura del proyecto y definición del manifiesto}
@@ -75,7 +80,7 @@ precisas, no como una caja negra que actúa de forma autónoma.
 
 \subsection{Diseño del Manifiesto}
 
-El issue \#2 plantea la primera pregunta de diseño real del sistema: ¿qué aspecto tiene el
+El \href{https://github.com/lucpez/cloudporter/issues/2}{issue~\#2} plantea la primera pregunta de diseño real del sistema: ¿qué aspecto tiene el
 fichero que el usuario escribe para describir su infraestructura? La respuesta debe ser lo
 suficientemente expresiva como para capturar los requisitos de infraestructura habituales,
 pero suficientemente simple como para que sea comprensible sin conocimiento previo de ningún
@@ -140,8 +145,8 @@ en un proveedor real. Se elige \textbf{Amazon Web Services (AWS)} como primer de
 el proveedor con mayor cuota de mercado en infraestructura en la nube, lo que maximiza la
 relevancia de la demostración.
 
-El issue \#7 define el objetivo: implementar el comando \texttt{translate} para recursos de
-cómputo en AWS. El issue \#10, abierto a continuación, añade un refinamiento: una vez
+El \href{https://github.com/lucpez/cloudporter/issues/7}{issue~\#7} define el objetivo: implementar el comando \texttt{translate} para recursos de
+cómputo en AWS. El \href{https://github.com/lucpez/cloudporter/issues/10}{issue~\#10}, abierto a continuación, añade un refinamiento: una vez
 generadas las plantillas, la herramienta debe inicializar automáticamente el directorio de
 OpenTofu para evitar que el usuario tenga que recordar ese paso manual.
 
@@ -198,7 +203,7 @@ Los sistemas operativos soportados en esta iteración son \texttt{ubuntu-22.04} 
 
 \subsection{Inicialización automática de OpenTofu}
 
-El issue \#10 identifica un punto de fricción en el flujo de uso: tras ejecutar
+El \href{https://github.com/lucpez/cloudporter/issues/10}{issue~\#10} identifica un punto de fricción en el flujo de uso: tras ejecutar
 \texttt{translate}, el usuario debe recordar ejecutar \texttt{tofu init} en el directorio
 generado antes de poder desplegar. Olvidar este paso produce un error críptico que no es
 obvio para alguien que no conoce el funcionamiento interno de OpenTofu.
@@ -228,7 +233,7 @@ de CPU/memoria sin instancia disponible en el catálogo.
 Traducir un manifiesto sin poder desplegarlo directamente desde la herramienta es un flujo
 incompleto: obliga al usuario a saltar entre \texttt{cport} y \texttt{tofu} manualmente, lo
 que introduce pasos intermedios propensos a errores y rompe la experiencia de herramienta
-unificada que persigue CloudPorter. El issue \#12 plantea cerrar ese ciclo con un comando
+unificada que persigue CloudPorter. El \href{https://github.com/lucpez/cloudporter/issues/12}{issue~\#12} plantea cerrar ese ciclo con un comando
 \texttt{deploy} que ejecute el proceso completo —traducción, inicialización y aprovisionamiento
 de infraestructura— en una sola invocación.
 
@@ -291,7 +296,7 @@ esperados cuando OpenTofu no está disponible o el proveedor no existe.
 Con AWS funcionando de extremo a extremo, el sistema demuestra que la abstracción del
 manifiesto funciona para un proveedor. Sin embargo, el valor diferencial de CloudPorter
 reside en la portabilidad entre proveedores: un sistema que solo soporta uno no resuelve
-el problema del lock-in, simplemente lo traslada a otra plataforma. El issue \#20 plantea
+el problema del lock-in, simplemente lo traslada a otra plataforma. El \href{https://github.com/lucpez/cloudporter/issues/20}{issue~\#20} plantea
 añadir \textbf{Microsoft Azure} como segundo proveedor soportado, lo que constituye la
 prueba real de que el diseño es generalizable.
 
@@ -364,12 +369,12 @@ continua.
 Dos issues permanecen abiertos al finalizar este trabajo:
 
 \begin{itemize}
-    \item \textbf{Issue \#21 — Reorganización de tests del traductor AWS:} tarea de
+    \item \textbf{\href{https://github.com/lucpez/cloudporter/issues/21}{Issue~\#21} — Reorganización de tests del traductor AWS:} tarea de
     mantenimiento interno que propone extraer las comprobaciones de contenido de los
     tests de traducción y reorganizarlas en un directorio propio. No bloquea ninguna
     funcionalidad, pero mejora la mantenibilidad de la suite a medida que crece el
     número de recursos y proveedores soportados.
-    \item \textbf{Issue \#23 — Comando \texttt{estimate}:} funcionalidad que permitiría
+    \item \textbf{\href{https://github.com/lucpez/cloudporter/issues/23}{Issue~\#23} — Comando \texttt{estimate}:} funcionalidad que permitiría
     comparar el coste estimado de un despliegue entre proveedores antes de ejecutarlo,
     consultando las APIs de precios de AWS y Azure. Este módulo formaba parte del alcance
     original acordado con el tutor —descrito en el capítulo~\ref{cap:especificacion}—
