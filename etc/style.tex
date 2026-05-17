@@ -138,6 +138,15 @@
   morestring=[b]'
 }
 
+% YAML
+\lstdefinelanguage{yaml}{
+  keywords={true,false,null,yes,no},
+  sensitive=false,
+  comment=[l]{\#},
+  morestring=[b]',
+  morestring=[b]"
+}
+
 %Comentarios con todonotes
 \newcommand{\Lucas}[2][]{\todo[inline, color=green!30, caption={ToDo - Lucas}, #1]{\begin{minipage}{\textwidth-4pt} #2\\ {\bf  -- Lucas} \end{minipage}}}
 \newcommand{\Juanlu}[2][]{\todo[inline, color=gray!20, caption={ToDo - Juanlu}, #1]{\begin{minipage}{\textwidth-4pt} #2 {\bf -- Juanlu}\end{minipage}}}

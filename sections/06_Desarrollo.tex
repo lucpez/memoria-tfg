@@ -1,11 +1,383 @@
 \chapter{Desarrollo}\label{cap:desarrollo}
 
-% Estructura por iteraciones (Kanban). Cada iteración sigue el ciclo:
-%   - Qué se va a atacar y por qué (justificación)
-%   - Decisiones de diseño tomadas para esa iteración
-%   - Implementación
-%   - Resultado y aprendizajes
-%
-% El número de iteraciones y su dirección emergen durante el desarrollo.
-% La libertad de pivotar (FinOps, plataforma, frontend...) está justificada
-% mientras cada decisión quede argumentada en el texto.
+Este capítulo describe el proceso de construcción de \textbf{CloudPorter} a lo largo de cuatro
+iteraciones de desarrollo organizadas mediante un tablero \textbf{Kanban} en GitHub. Cada iteración
+parte de uno o varios issues concretos que identifican el siguiente valor que debe aportar el
+sistema, recorre las decisiones de diseño tomadas para abordarlo y concluye con el resultado
+observable al finalizar la entrega. La elección de Kanban como metodología —frente a sprints
+de longitud fija— permite que el ritmo de avance se adapte a la naturaleza exploratoria del
+trabajo: cuando emerge una decisión de diseño compleja o aparece un obstáculo técnico imprevisto,
+el ciclo se alarga sin forzar cierres artificiales.
+
+El desarrollo se inicia el 29 de abril de 2026 y abarca hasta el 17 de mayo, con un total de
+veintitrés issues abiertos en el repositorio —veintidós cerrados y uno en curso al cierre de
+este documento— y veintidós \textit{pull requests} mergeados. A continuación se detallan cada
+una de las iteraciones, su justificación y los aprendizajes que dejaron.
+
+% ---------------------------------------------------------------------------
+\section{Iteración 1 — Infraestructura del proyecto y definición del manifiesto}
+\label{sec:iter1}
+% Issues: #2 (manifest+validate), PRs: #1 (devenv), #4 (skill), #5 (manifest), #6 (CI)
+% Período: 29 abr – 3 may 2026
+
+\subsection{Objetivo y justificación}
+
+Antes de implementar cualquier funcionalidad de negocio es necesario establecer los cimientos
+del proyecto: un entorno de desarrollo reproducible que garantice que cualquier colaborador —o
+el propio autor en una sesión futura— pueda trabajar sin fricciones de configuración, y una
+definición precisa del artefacto central del sistema. En el caso de CloudPorter, ese artefacto
+central es el \textbf{Manifiesto}: el fichero YAML en el que el usuario describe su infraestructura
+de forma agnóstica al proveedor.
+
+La decisión de abordar la infraestructura del proyecto antes que cualquier funcionalidad
+responde a una razón práctica: si las herramientas de calidad no están en su sitio desde el
+primer commit, el coste de instalarlas a posteriori crece con cada línea de código añadida.
+Configurar desde el principio el linting, el tipado estático y la cobertura de tests impone
+una disciplina que reduce la deuda técnica de manera continua, sin necesidad de una fase de
+«limpieza» al final del proyecto.
+
+\subsection{Entorno de desarrollo}
+
+El entorno de desarrollo se define mediante un \textbf{devcontainer} —un contenedor Docker
+que declara todas las dependencias de sistema necesarias para el proyecto— con el fin de
+garantizar la reproducibilidad independientemente de la máquina del desarrollador. La imagen
+resultante incluye \textbf{Python 3.14}, \textbf{OpenTofu} 1.11.6 y la interfaz de línea de
+comandos de GitHub (\textbf{GitHub CLI}), entre otras utilidades.
+
+La calidad del código se automatiza mediante \textbf{pre-commit}, una herramienta que ejecuta
+comprobaciones en el momento del commit para impedir que código que no supera los criterios
+de calidad llegue al repositorio. Se configuran tres comprobaciones principales:
+
+\begin{itemize}
+    \item \textbf{Ruff:} linter y formateador de Python que combina en una sola herramienta
+    lo que antes requerían \textit{flake8}, \textit{isort} y \textit{black}, con una velocidad
+    de ejecución notablemente superior al estar implementado en Rust.
+    \item \textbf{mypy:} comprobador de tipos estático para Python que verifica la coherencia
+    de las anotaciones de tipo en tiempo de análisis, sin necesidad de ejecutar el código.
+    \item \textbf{pytest:} ejecuta la suite de tests con un umbral mínimo de cobertura del
+    80\%, de forma que ningún commit puede llegar al repositorio sin mantener ese nivel.
+\end{itemize}
+
+Adicionalmente, se integra un flujo de \textbf{GitHub Actions} que ejecuta las mismas
+comprobaciones en la nube con cada pull request, cerrando así el ciclo de calidad tanto en
+local como en el repositorio remoto.
+
+Con el fin de integrar \textbf{Claude Code} \cite{claudeCode} de forma coherente en el
+flujo de trabajo, se desarrolla durante esta iteración la primera skill propia del proyecto:
+\texttt{create-issue}. Una \hyperlink{skill}{\textit{skill}} de Claude Code es un conjunto
+de instrucciones y convenciones encapsuladas que se activan bajo demanda, orientando al
+agente en una tarea concreta. En este caso, la skill guía al agente a través de la creación
+de issues de GitHub siguiendo las convenciones del proyecto —título descriptivo en lenguaje
+natural, contexto del problema, criterios de aceptación— y solo ejecuta la creación
+tras la aprobación explícita del autor. Esta práctica es característica del proceso
+documentado en este TFG: tratar al agente de IA como un colaborador con instrucciones
+precisas, no como una caja negra que actúa de forma autónoma.
+
+\subsection{Diseño del Manifiesto}
+
+El issue \#2 plantea la primera pregunta de diseño real del sistema: ¿qué aspecto tiene el
+fichero que el usuario escribe para describir su infraestructura? La respuesta debe ser lo
+suficientemente expresiva como para capturar los requisitos de infraestructura habituales,
+pero suficientemente simple como para que sea comprensible sin conocimiento previo de ningún
+proveedor en concreto.
+
+Se define un esquema mínimo con dos conceptos:
+
+\begin{itemize}
+    \item \textbf{Manifiesto}: documento con un nombre de proyecto y una lista de recursos.
+    \item \textbf{ComputeResource}: el primer —y, en esta iteración, único— tipo de recurso
+    soportado. Se describe mediante cuatro atributos: nombre, número de núcleos de CPU,
+    memoria en gigabytes y sistema operativo.
+\end{itemize}
+
+La figura siguiente muestra un ejemplo real de manifiesto:
+
+\begin{lstlisting}[language=yaml, caption={Ejemplo de manifiesto CloudPorter para un servidor web sencillo.}, label={lst:manifest}]
+name: mi-aplicacion
+resources:
+  - name: servidor-web
+    type: compute
+    cpu: 2
+    memory_gb: 4
+    os: ubuntu-22.04
+\end{lstlisting}
+
+Este diseño refleja una decisión deliberada: el usuario no declara ningún detalle de red,
+ninguna región, ningún identificador de imagen de sistema operativo. CloudPorter se encarga
+de resolver todos esos detalles en el momento de la traducción. La justificación es que la
+abstracción solo tiene valor si protege al usuario de las diferencias entre proveedores; si
+el manifiesto expusiera conceptos como \textit{subnet} o \textit{AMI}, el usuario estaría
+escribiendo para un proveedor concreto con otra sintaxis.
+
+La validación del manifiesto se implementa con \textbf{Pydantic}, una biblioteca de Python
+que verifica en tiempo de ejecución que los datos cumplen el esquema declarado —tipos,
+rangos, invariantes— y genera mensajes de error legibles cuando no es así. Entre los
+invariantes validados se encuentra la ausencia de recursos con nombres duplicados dentro
+del mismo manifiesto.
+
+El resultado de esta iteración es el primer comando público de la herramienta:
+\texttt{cport validate <manifiesto>}, que carga el fichero YAML, lo valida contra el esquema
+y reporta si es correcto o detalla los errores encontrados.
+
+\subsection{Resultado}
+
+Al cierre de la primera iteración el proyecto cuenta con un entorno de desarrollo funcional,
+pipelines de calidad automatizados y el esquema del Manifiesto definido y validable. No existe
+todavía ninguna funcionalidad de traducción o despliegue, pero sí una base sólida sobre la
+que construirlas sin acumular deuda técnica desde el primer día.
+
+% ---------------------------------------------------------------------------
+\section{Iteración 2 — Traducción a AWS}
+\label{sec:iter2}
+% Issues: #7 (translate AWS), #10 (tofu init), PRs: #8, #9, #11, #13
+% Período: 3 may – 9 may 2026
+
+\subsection{Objetivo y justificación}
+
+Con el Manifiesto definido, el siguiente paso natural es demostrar que la traducción funciona:
+tomar ese fichero YAML agnóstico y convertirlo en plantillas de infraestructura desplegables
+en un proveedor real. Se elige \textbf{Amazon Web Services (AWS)} como primer destino por ser
+el proveedor con mayor cuota de mercado en infraestructura en la nube, lo que maximiza la
+relevancia de la demostración.
+
+El issue \#7 define el objetivo: implementar el comando \texttt{translate} para recursos de
+cómputo en AWS. El issue \#10, abierto a continuación, añade un refinamiento: una vez
+generadas las plantillas, la herramienta debe inicializar automáticamente el directorio de
+OpenTofu para evitar que el usuario tenga que recordar ese paso manual.
+
+\subsection{Arquitectura del traductor}
+
+La arquitectura del módulo de traducción se diseña con dos principios en mente: extensibilidad
+—añadir un nuevo proveedor no debe requerir modificar el código existente— y determinismo
+—dados los mismos inputs, el output siempre es idéntico, sin componentes aleatorios ni
+llamadas a servicios externos.
+
+Para cumplir el primer principio se adopta un sistema de \textbf{carga dinámica de módulos}:
+el comando \texttt{translate} recibe el nombre del proveedor como argumento y carga en tiempo
+de ejecución el módulo Python correspondiente (\texttt{cloudporter.translator.aws},
+\texttt{cloudporter.translator.azure}, etc.). Añadir un nuevo proveedor es tan sencillo como
+crear un nuevo módulo que exponga la función \texttt{render\_tofu}; no se toca ninguna línea
+del código existente.
+
+Para la generación de ficheros de configuración se emplean \textbf{plantillas Jinja2}, una
+biblioteca de templating que permite separar la estructura de los ficheros OpenTofu
+del código Python que los rellena. Cada tipo de recurso por proveedor tiene sus propias
+plantillas, lo que facilita su mantenimiento independiente.
+
+\subsection{El mapper determinístico}
+
+La pieza más relevante del traductor AWS es la resolución del tipo de instancia: el usuario
+especifica CPU y memoria en el manifiesto, pero AWS requiere un identificador concreto como
+\texttt{t3.medium} o \texttt{m5.xlarge}. Se diseña un \textbf{mapper determinístico} basado
+en un catálogo interno de instancias —ordenadas de menor a mayor capacidad— que selecciona
+el tipo más pequeño cuyas especificaciones superan o igualan las solicitadas por el usuario.
+
+Este enfoque tiene dos ventajas frente a las alternativas consideradas. Primero, no requiere
+llamadas a la API de AWS en el momento de la traducción, lo que elimina dependencias de red
+y reduce el tiempo de respuesta. Segundo, el resultado es completamente predecible: el mismo
+manifiesto siempre produce el mismo tipo de instancia, lo que facilita la revisión y el
+control de cambios en el repositorio de infraestructura.
+
+\subsection{Recursos generados}
+
+Para cada \texttt{ComputeResource} del manifiesto, el traductor AWS genera dos recursos
+OpenTofu:
+
+\begin{enumerate}
+    \item Un \textbf{data source} \texttt{aws\_ami} que busca la imagen de sistema operativo
+    correcta aplicando filtros por nombre y arquitectura, de forma que siempre se obtiene la
+    AMI más reciente publicada por el propietario oficial —sin necesitar que el usuario
+    conozca el identificador de imagen de cada región.
+    \item Un recurso \texttt{aws\_instance} que referencia esa AMI y configura el tipo de
+    instancia seleccionado por el mapper, junto con los parámetros de red necesarios
+    —VPC, subred y grupo de seguridad— generados automáticamente.
+\end{enumerate}
+
+Los sistemas operativos soportados en esta iteración son \texttt{ubuntu-22.04} y
+\texttt{ubuntu-24.04}.
+
+\subsection{Inicialización automática de OpenTofu}
+
+El issue \#10 identifica un punto de fricción en el flujo de uso: tras ejecutar
+\texttt{translate}, el usuario debe recordar ejecutar \texttt{tofu init} en el directorio
+generado antes de poder desplegar. Olvidar este paso produce un error críptico que no es
+obvio para alguien que no conoce el funcionamiento interno de OpenTofu.
+
+La solución adoptada es que el propio comando \texttt{translate} ejecute \texttt{tofu init}
+automáticamente al finalizar la generación de plantillas. Si el binario de OpenTofu no está
+disponible en el sistema, se emite una advertencia en lugar de un error, para no romper el
+flujo en entornos donde solo se quiere generar las plantillas sin desplegar.
+
+\subsection{Resultado}
+
+Al finalizar la segunda iteración existe un flujo completo de traducción:
+\texttt{cport translate manifiesto.yaml --provider aws} genera un directorio con las
+plantillas OpenTofu listas para desplegar e inicializa el directorio de forma automática.
+La suite de tests crece para cubrir la traducción de recursos de cómputo AWS, verificando
+tanto los ficheros generados como los casos de error —proveedor no soportado, especificaciones
+de CPU/memoria sin instancia disponible en el catálogo.
+
+% ---------------------------------------------------------------------------
+\section{Iteración 3 — Comando \texttt{deploy} y automatización del flujo de trabajo}
+\label{sec:iter3}
+% Issues: #12 (deploy), PRs: #14, #15, #16, #17, #18
+% Período: 10 may – 14 may 2026
+
+\subsection{Objetivo y justificación}
+
+Traducir un manifiesto sin poder desplegarlo directamente desde la herramienta es un flujo
+incompleto: obliga al usuario a saltar entre \texttt{cport} y \texttt{tofu} manualmente, lo
+que introduce pasos intermedios propensos a errores y rompe la experiencia de herramienta
+unificada que persigue CloudPorter. El issue \#12 plantea cerrar ese ciclo con un comando
+\texttt{deploy} que ejecute el proceso completo —traducción, inicialización y aprovisionamiento
+de infraestructura— en una sola invocación.
+
+\subsection{Diseño del comando \texttt{deploy}}
+
+El comando \texttt{deploy} encadena internamente los pasos de la iteración anterior
+—\texttt{translate} e \texttt{init}— y añade la fase de aprovisionamiento mediante
+\texttt{tofu apply}. Para que sea útil en distintos contextos de uso, se diseñan tres
+opciones complementarias:
+
+\begin{itemize}
+    \item \textbf{\texttt{--dry-run}:} ejecuta \texttt{tofu plan} en lugar de
+    \texttt{tofu apply}, mostrando qué recursos se crearían o modificarían sin realizar
+    ningún cambio real en la nube. Esta opción es especialmente relevante en entornos donde
+    un despliegue incorrecto tiene consecuencias económicas inmediatas.
+    \item \textbf{\texttt{--auto-approve}:} suprime la confirmación interactiva que
+    OpenTofu solicita antes de aplicar cambios, lo que permite integrar el comando en
+    pipelines automatizados de CI/CD sin intervención humana.
+    \item \textbf{\texttt{--verbose}:} transmite en tiempo real la salida completa de
+    OpenTofu al terminal del usuario, en lugar de ocultarla y mostrar únicamente el resultado
+    final. Resulta útil para diagnóstico cuando un despliegue falla o tarda más de lo esperado.
+\end{itemize}
+
+Una vez completado el aprovisionamiento, el comando consulta el estado del despliegue
+mediante \texttt{tofu show} y muestra un resumen de los recursos creados con sus
+identificadores, lo que permite al usuario verificar de un vistazo qué se ha creado en
+la nube sin necesidad de acceder a la consola del proveedor.
+
+\subsection{Automatización del flujo de desarrollo}
+
+En paralelo al comando \texttt{deploy}, esta iteración incorpora mejoras al propio flujo
+de trabajo del proyecto. Se añade un workflow de GitHub Actions que verifica las convenciones
+de los pull requests —formato del título, referencia a un issue mediante la sintaxis
+\texttt{closes \#N}— y sincroniza automáticamente las etiquetas del PR con las del issue
+vinculado. El objetivo es reducir el trabajo manual de triaje y mantener la trazabilidad
+entre issues y entregas sin depender de la disciplina del desarrollador.
+
+Asimismo, se documentan las convenciones de traducción en ficheros de reglas del repositorio,
+accesibles tanto para revisiones manuales como para las sesiones de Claude Code utilizadas
+durante el desarrollo. Esta práctica, aunque secundaria al producto en sí, refleja una decisión
+de diseño del proceso: tratar la documentación de convenciones como un artefacto de primera
+clase, no como algo que se escribe solo cuando alguien las olvida.
+
+\subsection{Resultado}
+
+Al cierre de la tercera iteración existe un flujo de despliegue completo y usable: desde
+el manifiesto YAML hasta la infraestructura aprovisionada en AWS, sin salir de la interfaz
+de línea de comandos de CloudPorter. Los tests cubren el comando \texttt{deploy} en sus
+distintas combinaciones de opciones, verificando tanto el caso de éxito como los errores
+esperados cuando OpenTofu no está disponible o el proveedor no existe.
+
+% ---------------------------------------------------------------------------
+\section{Iteración 4 — Soporte de Azure}
+\label{sec:iter4}
+% Issues: #20 (Azure provider), PRs: #19 (devenv Azure CLI), #22
+% Período: 14 may – 17 may 2026
+
+\subsection{Objetivo y justificación}
+
+Con AWS funcionando de extremo a extremo, el sistema demuestra que la abstracción del
+manifiesto funciona para un proveedor. Sin embargo, el valor diferencial de CloudPorter
+reside en la portabilidad entre proveedores: un sistema que solo soporta uno no resuelve
+el problema del lock-in, simplemente lo traslada a otra plataforma. El issue \#20 plantea
+añadir \textbf{Microsoft Azure} como segundo proveedor soportado, lo que constituye la
+prueba real de que el diseño es generalizable.
+
+La elección de Azure —frente a Google Cloud Platform como alternativa— responde a su posición
+como segundo proveedor en cuota de mercado empresarial y a sus diferencias arquitectónicas
+con AWS, que son suficientemente significativas como para que el traductor tenga que resolverlas
+sin exponerlas al usuario.
+
+\subsection{Diferencias arquitectónicas con AWS}
+
+Añadir Azure no es simplemente reescribir las plantillas con nombres distintos: el modelo de
+recursos de Azure introduce conceptos que AWS no requiere de forma explícita. Para cada
+despliegue en Azure es necesario aprovisionar:
+
+\begin{itemize}
+    \item \textbf{Resource Group:} contenedor lógico que agrupa todos los recursos de Azure
+    asociados a un proyecto. AWS no tiene un equivalente directo obligatorio.
+    \item \textbf{Virtual Network y Subnet:} Azure requiere una definición explícita de la
+    red virtual en el código OpenTofu, mientras que AWS permite referenciar la VPC por defecto.
+    \item \textbf{Gestión de claves SSH:} en Azure, las máquinas virtuales Linux requieren
+    una clave SSH pública declarada en el recurso. El traductor la genera automáticamente
+    en el directorio de salida para no requerir que el usuario la proporcione.
+    \item \textbf{Soporte Windows Server:} Azure introduce en esta iteración el soporte para
+    \texttt{windows-server-2022}, que requiere un tratamiento distinto al de las imágenes
+    Linux en cuanto a autenticación y configuración de variables de entrada.
+\end{itemize}
+
+Todas estas diferencias son resueltas internamente por el módulo de traducción de Azure.
+El manifiesto del usuario es idéntico independientemente del proveedor destino: el mismo
+fichero YAML que despliega en AWS puede traducirse a Azure con únicamente el cambio del
+argumento \texttt{--provider}. Ésta es precisamente la propiedad que el sistema persigue.
+
+\subsection{El mapper determinístico en Azure}
+
+Al igual que en AWS, se implementa un catálogo interno de tipos de instancia Azure —la
+familia \texttt{Standard\_B}— ordenados por capacidad, con el mismo algoritmo de selección:
+el tipo más pequeño que cumple o supera los requisitos de CPU y memoria declarados en el
+manifiesto. El catálogo cubre desde instancias de uso general ligero (\texttt{Standard\_B2s\_v2},
+2 vCPUs y 8~GB) hasta configuraciones de mayor capacidad (\texttt{Standard\_B32s\_v2},
+32 vCPUs y 128~GB).
+
+\subsection{Actualización del entorno de desarrollo}
+
+El PR \#19, previo a la implementación del proveedor, actualiza el devcontainer para incluir
+la \textbf{CLI de Azure} y la \textbf{CLI de AWS}, necesarias para autenticarse en cada
+proveedor antes de ejecutar \texttt{tofu apply}. Adicionalmente, las dependencias de
+pre-commit se fijan mediante hashes criptográficos en lugar de rangos de versión, una práctica
+de seguridad que previene ataques de cadena de suministro en los que una actualización
+automática de una dependencia podría introducir código malicioso.
+
+\subsection{Resultado}
+
+Al finalizar la cuarta iteración, CloudPorter soporta dos proveedores de nube —AWS y
+Azure— con un manifiesto común. El mismo fichero que describe una máquina virtual con
+2~vCPUs, 4~GB de RAM y Ubuntu 22.04 genera plantillas OpenTofu correctas para ambos
+proveedores, gestionando internamente las diferencias de red, nomenclatura de instancias
+y autenticación. La suite de tests cubre la traducción Azure de forma análoga a la de AWS,
+verificando los recursos generados para cada sistema operativo soportado.
+
+% ---------------------------------------------------------------------------
+\section{Estado actual y trabajo futuro inmediato}
+\label{sec:estado-actual}
+
+Al cierre del período de desarrollo documentado en este capítulo, CloudPorter implementa
+el flujo central de la propuesta: describir infraestructura una vez en un manifiesto
+agnóstico y desplegarla en AWS o Azure mediante una única herramienta. Este flujo está
+cubierto por una suite de tests automatizados y verificado por pipelines de calidad
+continua.
+
+Dos issues permanecen abiertos al finalizar este trabajo:
+
+\begin{itemize}
+    \item \textbf{Issue \#21 — Reorganización de tests del traductor AWS:} tarea de
+    mantenimiento interno que propone extraer las comprobaciones de contenido de los
+    tests de traducción y reorganizarlas en un directorio propio. No bloquea ninguna
+    funcionalidad, pero mejora la mantenibilidad de la suite a medida que crece el
+    número de recursos y proveedores soportados.
+    \item \textbf{Issue \#23 — Comando \texttt{estimate}:} funcionalidad que permitiría
+    comparar el coste estimado de un despliegue entre proveedores antes de ejecutarlo,
+    consultando las APIs de precios de AWS y Azure. Este módulo formaba parte del alcance
+    original acordado con el tutor —descrito en el capítulo~\ref{cap:especificacion}—
+    y queda como el trabajo futuro inmediato de mayor prioridad. Su ausencia en esta
+    entrega es consecuencia de que la implementación del traductor con soporte multi-proveedor
+    resultó más compleja de lo estimado inicialmente, especialmente en lo relativo a las
+    diferencias arquitectónicas entre AWS y Azure.
+\end{itemize}
+
+Ambos issues están documentados en el repositorio y serán el punto de partida de las
+siguientes iteraciones del proyecto.
