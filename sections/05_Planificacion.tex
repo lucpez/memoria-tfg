@@ -8,44 +8,54 @@ utilizadas, la planificación temporal y una estimación del presupuesto del pro
 \section{Estrategia de desarrollo}
 
 El problema que aborda CloudPorter es amplio y sus dimensiones —abstracción de
-infraestructura, estimación de costes, seguridad— no pueden
-abordarse en paralelo con los recursos disponibles. La estrategia adoptada consiste
-en construir de dentro hacia afuera: primero el núcleo que hace viable el enfoque,
-y después las capas que lo enriquecen.
+infraestructura, estimación de costes, seguridad— no pueden desarrollarse de forma
+simultánea en el marco de un Trabajo de Fin de Grado realizado por una sola persona.
+La estrategia planteada consiste en construir de dentro hacia afuera: primero el
+núcleo que hace viable el enfoque y, sobre él, las capas que lo enriquecen.
 
-El punto de partida es la traducción Manifest → proveedor cloud, ya que sin ella
-el resto del sistema carece de base. Una vez demostrada esa viabilidad, se
-desarrollan de forma independiente el análisis estático de seguridad de las plantillas generadas —que detecta
-configuraciones inseguras antes de cualquier ejecución— y el módulo de estimación
-de costes, que permite comparar el coste de la arquitectura entre proveedores sin
-necesidad de infraestructura real. Ambos módulos permiten demostrar el valor de
-la herramienta antes de desplegar nada.
+El núcleo es el flujo agnóstico de extremo a extremo de describir la infraestructura en
+el Manifest, traducirla a las plantillas de un proveedor cloud y desplegarla. Sin esa
+base funcionando, el resto del sistema carece de sentido, por lo que es lo primero
+que se aborda. El soporte a un segundo proveedor se contempla como la prueba de que
+el enfoque es realmente portable.
 
-A continuación se construye la CLI como capa de integración que unifica y expone
-al usuario el conjunto de funcionalidades anteriores. El despliegue efectivo de
-infraestructura se incorpora al final, cuando el resto del sistema ya está
-validado: es el punto donde todo converge y donde el enfoque agnóstico se
-materializa en recursos reales en la nube.
+Sobre ese núcleo se prevén las capas que aportan valor sin necesidad de
+infraestructura real, por operar sobre el propio Manifest: la estimación comparativa
+de costes entre proveedores y la auditoría de seguridad, que detecta configuraciones
+inseguras antes del despliegue. Junto a ellas, la cobertura de tipos de recurso
+adicionales, como las bases de datos, amplía lo que el sistema puede representar.
+
+La interfaz de línea de comandos es el punto de entrada que expone cada una de estas
+funcionalidades a medida que se incorporan.
 
 En cuanto a la elección de proveedores, se ha optado por \textbf{AWS} y
 \textbf{Microsoft Azure} como plataformas objetivo de la versión inicial. AWS es
 el líder indiscutible del mercado cloud y el punto de referencia para cualquier
 herramienta de infraestructura; Azure es el segundo proveedor por cuota de mercado
-y el más presente en entornos empresariales —precisamente el contexto donde el
+y el más presente en entornos empresariales, precisamente el contexto donde el
 lock-in tiene mayor impacto organizacional y económico \cite{flexera2026}. El
 soporte a dos proveedores es suficiente para demostrar la viabilidad del enfoque
 agnóstico.
 
 \section{Metodología}
 
+En esta sección se describen primero el marco de gestión del trabajo, Kanban, y el ciclo
+que recorre cada unidad de trabajo; a continuación, las decisiones técnicas de fondo y las
+herramientas que dan soporte al proceso: el motor de infraestructura como código, el lenguaje
+de implementación, el entorno de desarrollo, los controles de calidad y la automatización.
+
 \subsection{Kanban}
 
 Se ha adoptado \textbf{Kanban} como metodología de desarrollo por su adecuación
-al carácter exploratorio del proyecto. A diferencia de metodologías con sprints
-fijos como Scrum, Kanban permite un flujo continuo de trabajo sin comprometerse
-con un volumen predefinido de tareas por iteración — lo que encaja con un proyecto
-donde el diseño emerge durante el desarrollo y las prioridades pueden cambiar en
-función de los resultados obtenidos.
+al carácter exploratorio del proyecto. Al emerger el diseño durante el propio
+desarrollo, no es posible anticipar cuánto trabajo conllevará cada ciclo ni cuánto
+durará, por lo que comprometerse de antemano con un volumen fijo de tareas por
+iteración —como exigen los sprints de Scrum— resultaría artificial. Kanban, en
+cambio, propone un flujo continuo de trabajo sin ese compromiso previo, lo que permite
+reordenar las prioridades en función de los resultados que se van obteniendo. A esta
+razón se suma una de orden práctico: la dedicación al proyecto no pudo ser constante,
+al compaginarse con un empleo y otras asignaturas, sino concentrada en ráfagas, un
+patrón al que ese flujo continuo se adapta con naturalidad.
 
 El tablero Kanban se gestiona íntegramente en \textbf{GitHub Projects}, integrado
 con el repositorio del código. Cada unidad de trabajo se representa como un
@@ -66,18 +76,14 @@ un pull request una vez superados los checks de CI. La rama principal está
 protegida y no recibe cambios directos.
 
 Los mensajes de commit siguen la especificación \textbf{Conventional
-Commits}~\cite{conventionalCommits}, que establece un formato estructurado
-—\texttt{tipo(ámbito): descripción}— legible tanto por personas como por
+Commits}~\cite{conventionalCommits}, que establece un formato estructurado,
+\texttt{tipo(ámbito): descripción}, legible tanto por personas como por
 herramientas de automatización.
 
 Los issues de mayor entidad, o grupos de issues relacionados, dan lugar a ciclos
 de desarrollo documentados en el capítulo~\ref{cap:desarrollo}, siguiendo la
-estructura: objetivo de la iteración, decisiones de diseño, implementación y
-resultado. Los cambios menores —incorporación de skills de Claude Code,
-actualizaciones del devcontainer o ajustes de configuración de CI— se integran
-directamente mediante pull request sin abrir un issue propio, dado que no
-requieren un ciclo de diseño formal; se mencionan en el contexto de la iteración
-a la que pertenecen.
+estructura de objetivo de la iteración, decisiones de diseño, implementación y
+resultado.
 
 \subsection{Ciclo de desarrollo}
 
@@ -88,7 +94,7 @@ El ciclo de desarrollo para cada iteración sigue el siguiente flujo:
     los criterios de aceptación en el issue de GitHub.
 
     \item \textbf{Diseño:} antes de implementar, se toman y documentan las
-    decisiones de diseño relevantes — qué se construye, cómo y por qué.
+    decisiones de diseño relevantes: qué se construye, cómo y por qué.
 
     \item \textbf{Implementación:} esta fase se hace con el apoyo
     de \textbf{Claude Code}\cite{claudeCode}, un agente de programación
@@ -120,7 +126,7 @@ en agosto de 2023 su empresa matriz, HashiCorp, cambió su licencia de
 \textit{Mozilla Public License 2.0} (MPL-2.0, open source) a
 \textit{Business Source License 1.1} (\hyperlink{bsl}{BSL}-1.1) \cite{terraformDocs}. Esta licencia
 restringe el uso comercial a entidades que compitan directamente con HashiCorp,
-pero no define con precisión qué constituye competencia — lo que genera una zona
+pero no define con precisión qué constituye competencia, lo que genera una zona
 gris legal para cualquier proyecto que construya herramientas de infraestructura
 sobre Terraform.
 
@@ -135,8 +141,8 @@ OpenTofu es la única opción que garantiza libertad de uso sin restricciones.
 
 En el plano del lenguaje de implementación, el proyecto se desarrolla íntegramente
 en \textbf{Python}. La elección responde a tres factores: un ecosistema de
-librerías maduro para el procesamiento de YAML y JSON —formatos centrales en
-la especificación de infraestructura—, una amplia disponibilidad de herramientas
+librerías maduro para el procesamiento de YAML y JSON, formatos centrales en
+la especificación de infraestructura, una amplia disponibilidad de herramientas
 para el desarrollo de interfaces de línea de comandos, y la familiaridad previa
 del autor con el lenguaje, que reduce la fricción en un proyecto de alcance
 acotado. La gestión de dependencias y entornos virtuales se realiza con
@@ -156,19 +162,15 @@ cualquier colaborador.
 Las herramientas de calidad no han sido elecciones independientes, sino un ecosistema
 diseñado para automatizar los estándares de mantenibilidad a nivel de commit. 
 Antes de cada commit, \textbf{pre-commit} \cite{precommitDocs} actúa como guardián 
-ejecutando dos comprobaciones: el formateador y linter \textbf{Ruff} \cite{ruffDocs} 
-—que reemplaza la combinación nhabitual de flake8 y black con un rendimiento muy superior— 
+ejecutando dos comprobaciones: el formateador y linter \textbf{Ruff} \cite{ruffDocs}
 y la verificación estática de tipos con \textbf{mypy} \cite{mypyDocs}. Ambas herramientas
 garantizan que ningún cambio se integra sin cumplir el estándar de formato y
 tipos, proporcionando feedback inmediato sin salir del flujo de trabajo local.
 
-Los tests automáticos se implementan con \textbf{pytest} \cite{pytestDocs}
-siguiendo una estrategia en tres niveles. En pre-push se ejecuta la suite
-completa excluyendo los tests marcados como lentos —aquellos que llaman a
-servicios externos o superan un segundo de ejecución, identificados mediante
-\texttt{@pytest.mark.slow}—, lo que evita subir código roto sin penalizar cada
-commit. En integración continua se ejecuta la suite completa con informe de
-cobertura, con un objetivo mínimo del 80\%.
+Los tests automáticos se implementan con \textbf{pytest} \cite{pytestDocs} y se
+ejecutan en dos momentos. Antes de cada push, la suite actúa como última
+comprobación local que evita subir código roto. En integración continua se ejecuta
+de nuevo, esta vez con informe de cobertura y un objetivo mínimo del 80\%.
 
 \subsection{Automatización}
 
@@ -208,26 +210,129 @@ que define el contexto del proyecto y el enfoque narrativo.
 
 \section{Cronograma}
 
-El proyecto se divide en dos fases principales:
+El proyecto se divide en dos fases principales, una de investigación y otra de
+desarrollo, cuyo reparto temporal se resume en la figura~\ref{fig:gantt}.
+
+La \textbf{fase de investigación} (febrero–abril de 2026) no siguió un recorrido
+lineal, sino un proceso exploratorio organizado en \textit{spikes}: investigaciones
+acotadas en el tiempo, cada una orientada a reducir una incertidumbre concreta. Se
+sucedieron, con solapes entre ellas, las siguientes:
 
 \begin{itemize}
-    \item \textbf{Fase de investigación} (febrero–abril de 2026): exploración del
-    dominio, análisis de herramientas existentes, formación en las tecnologías
-    necesarias y definición del alcance. Esta fase culmina con la redacción de
-    los capítulos 1 a 5 de esta memoria.
+    \item \textbf{S1. Detección del problema} (2--15 feb): las fricciones que el autor
+    encuentra en su propia experiencia con la nube, que motivan preguntarse si son un
+    caso aislado o un problema generalizado.
 
-    \item \textbf{Fase de desarrollo} (abril–junio de 2026): implementación
-    iterativa de CloudPorter siguiendo la metodología descrita, con documentación
-    simultánea en el capítulo~\ref{cap:desarrollo}.
+    \item \textbf{S2. Investigación del problema} (9 feb -- 15 mar): estudio de hasta
+    qué punto el cloud lock-in afecta a otros y de sus causas y dimensiones.
+
+    \item \textbf{S3. Exploración de soluciones} (23 feb -- 22 mar): revisión, en
+    paralelo con S2, de las herramientas existentes, que confirma que ninguna resolvía
+    el problema de forma satisfactoria.
+
+    \item \textbf{S4. Conceptualización y alcance} (16 mar -- 5 abr): definición de la
+    propuesta y delimitación de lo que entra en el trabajo.
+
+    \item \textbf{S5. Metodología y entorno} (30 mar -- 19 abr): elección de la
+    metodología de trabajo y montaje del entorno de desarrollo.
 \end{itemize}
 
-\Lucas{Completar: Insertar diagrama de Gantt con las fases del proyecto e incluirlo como figura aquí.}
+La formación en las tecnologías necesarias (2 feb -- 22 mar) acompañó de forma
+transversal a todo el proceso, en parte previa al inicio formal del trabajo. Esta fase
+culmina con la redacción de los capítulos 1 a 5.
+
+La \textbf{fase de desarrollo} (abril–junio de 2026) implementa CloudPorter de forma
+iterativa a lo largo de las ocho iteraciones documentadas en el
+capítulo~\ref{cap:desarrollo}, con redacción simultánea de la memoria y una fase final
+de evaluación y validación.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}[
+    hgrid, vgrid,
+    x unit=0.55cm,
+    y unit chart=0.6cm,
+    y unit title=0.7cm,
+    title height=1,
+    bar height=0.6,
+    bar/.append style={fill=blue!45, draw=blue!60},
+    group/.append style={fill=black!75, draw=black!75},
+    group right shift=0,
+    group top shift=0.1,
+    group height=0.5,
+    bar label font=\small,
+    group label font=\small\bfseries,
+    title label font=\small,
+    milestone/.append style={fill=red!70}
+]{1}{20}
+  \gantttitle{2026}{20} \\
+  \gantttitle{Febrero}{4}
+  \gantttitle{Marzo}{4}
+  \gantttitle{Abril}{5}
+  \gantttitle{Mayo}{4}
+  \gantttitle{Junio}{3} \\
+  \ganttgroup{Investigación}{1}{11} \\
+  \ganttbar{Formación (AWS, OpenTofu)}{1}{7} \\
+  \ganttbar{S1 · Detección del problema}{1}{2} \\
+  \ganttbar{S2 · Investigación del problema}{2}{6} \\
+  \ganttbar{S3 · Exploración de soluciones}{4}{7} \\
+  \ganttbar{S4 · Conceptualización y alcance}{7}{9} \\
+  \ganttbar{S5 · Metodología y entorno}{9}{11} \\
+  \ganttgroup{Desarrollo}{13}{20} \\
+  \ganttbar{Iteración 1 · Infra + manifiesto}{13}{14} \\
+  \ganttbar{Iteración 2 · Traducción AWS}{14}{14} \\
+  \ganttbar{Iteración 3 · Comando deploy}{15}{15} \\
+  \ganttbar{Iteración 4 · Soporte Azure}{16}{16} \\
+  \ganttbar{Iteración 5 · Estimación de costes}{17}{17} \\
+  \ganttbar{Iteración 6 · Base de datos}{17}{17} \\
+  \ganttbar{Iteración 7 · Auditoría}{17}{17} \\
+  \ganttbar{Iteración 8 · Demo de tres capas}{17}{17} \\
+  \ganttbar{Redacción de la memoria}{5}{20} \\
+  \ganttbar{Evaluación y validación}{18}{20}
+\end{ganttchart}%
+}
+\caption{Cronograma del proyecto: diagrama de Gantt de las fases de investigación y desarrollo.}
+\label{fig:gantt}
+\end{figure}
 
 \section{Presupuesto}
 
-A continuación se presenta una estimación del coste total del proyecto, calculado
-como si se tratase de un encargo profesional. Se consideran los costes de personal,
-hardware, software, infraestructura cloud, formación y gastos indirectos.
+A continuación se presenta una estimación del coste total del proyecto, calculado como
+si se tratase de un encargo profesional. La tabla~\ref{tab:presupuesto} desglosa los
+conceptos considerados y su coste.
+
+El coste de personal corresponde a una dedicación estimada de \textbf{326 horas} a una
+tarifa de 16~€/hora, propia de un perfil de ingeniero junior con especialización en
+entornos cloud. El cómputo es una estimación orientativa: dado el carácter exploratorio
+del proyecto y su gestión mediante Kanban, el trabajo se desarrolló de forma discontinua,
+en periodos de dedicación concentrada según la disponibilidad. Para aproximarla, se
+registró el tiempo al inicio y al cierre de cada unidad de trabajo, cada issue de
+desarrollo y cada spike de investigación, lo que arroja unas 326 horas: en torno a 190
+de investigación, formación y documentación (capítulos 1 a 5) y 136 de desarrollo,
+implementación y evaluación.
+
+El resto de conceptos se estima de la forma siguiente:
+
+\begin{itemize}
+    \item \textbf{Equipamiento informático:} un ordenador de gama media, suficiente porque
+    el despliegue se realiza en la nube y no exige hardware potente en local. Se estima un precio estimado de 1.200€.
+
+    \item \textbf{Infraestructura cloud:} sin coste. Las pruebas en Azure y en AWS se
+    cubrieron con los niveles gratuitos que ofrecen ambos proveedores, sin llegar a generar
+    gasto.
+
+    \item \textbf{Software:} nulo. Todas las herramientas empleadas son de código abierto o
+    de uso gratuito —Python, OpenTofu, GitHub en su plan gratuito, uv, Ruff y pytest—, junto
+    con Claude Code en su modalidad de uso académico.
+
+    \item \textbf{Suministros:} conexión a internet y electricidad del equipo durante los
+    meses de trabajo, a precios domésticos habituales.
+
+    \item \textbf{Formación:} sin coste. Durante la investigación se emplearon cursos y
+    recursos formativos gratuitos —tutoriales, documentación oficial y cursos en vídeo— y se
+    obtuvo la certificación OpenTofu Foundation, de la Linux Foundation, también gratuita.
+\end{itemize}
 
 \begin{table}[H]
 \centering
@@ -235,106 +340,16 @@ hardware, software, infraestructura cloud, formación y gastos indirectos.
 \hline
 \textbf{Concepto} & \textbf{Coste} \\
 \hline
-Personal              & --- \\
-Hardware              & --- \\
-Software              & 0,00 € \\
-Infraestructura cloud & --- \\
-Formación             & 79,31 € \\
-Gastos indirectos     & 250,00 € \\
+Personal & 5.216,00 € \\
+Equipamiento informático & 1.200€ € \\
+Software & 0,00 € \\
+Infraestructura cloud & 0,00 € \\
+Formación & 0,00 € \\
+Suministros (internet y electricidad) & 300,00 € \\
 \hline
-\textbf{Total}        & --- \\
-\hline
-\end{tabular}
-\caption{Resumen del presupuesto total del proyecto.}
-\label{tab:presupuesto-total}
-\end{table}
-
-\subsection{Personal}
-
-El proyecto ha sido desarrollado por una persona con perfil de ingeniero de
-software junior. Se aplica una tarifa de 16~€/hora, acorde con las tarifas de
-mercado para perfiles junior con especialización técnica en entornos cloud —según
-datos de portales de empleo como InfoJobs e Indeed para el sector tecnológico en
-España—, y considerando la cualificación requerida: diseño de sistemas cloud,
-infraestructura como código y desarrollo de CLI en Python.
-
-El cálculo del coste de personal es:
-
-\[
-\text{Coste total} = \text{horas trabajadas} \times 16~\text{€/hora}
-\]
-
-\begin{table}[H]
-\centering
-\begin{tabular}{lrrr}
-\hline
-\textbf{Fase} & \textbf{Duración} & \textbf{Horas} & \textbf{Coste} \\
-\hline
-Investigación y documentación & 8 semanas  & --- & --- \\
-Desarrollo e implementación   & 10 semanas & --- & --- \\
-\hline
-\textbf{Total personal}       &            & --- & --- \\
+\textbf{Total} & \textbf{6.716,00 €} \\
 \hline
 \end{tabular}
-\caption{Coste de personal del proyecto.}
-\label{tab:presupuesto-personal}
-\end{table}
-
-\subsection{Hardware}
-
-\subsection{Software y herramientas}
-
-La totalidad de las herramientas de desarrollo utilizadas en el proyecto son
-de código abierto o tienen licencia gratuita para uso académico:
-\textbf{Python}, \textbf{OpenTofu}, \textbf{GitHub} (plan gratuito),
-\textbf{uv}, \textbf{Ruff}, \textbf{pytest} y \textbf{Claude Code} (uso
-académico), entre otras. El coste asociado a software es por tanto nulo.
-
-\subsection{Infraestructura cloud}
-
-\subsection{Formación}
-
-Como parte del proceso de investigación se realizaron varios cursos y certificaciones
-en las tecnologías utilizadas en el proyecto. Además, se consultaron recursos
-formativos en línea de acceso gratuito —tutoriales, documentación oficial y cursos
-en vídeo-.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{lr}
-\hline
-\textbf{Concepto} & \textbf{Coste} \\
-\hline
-Certificación AWS Cloud Practitioner (certificación) & 50,00 € \\
-Curso AWS Solutions Architect Associate (A. Cantrill) & 29,31 € \\
-Certificación OpenTofu Foundation (Linux Foundation) & 0,00 € \\
-\hline
-\textbf{Total formación} & 79,31 € \\
-\hline
-\end{tabular}
-\caption{Costes de formación.}
-\label{tab:presupuesto-formacion}
-\end{table}
-
-\subsection{Gastos indirectos}
-
-Se incluyen los gastos derivados del uso de recursos básicos durante el período
-de desarrollo. La conexión a internet es necesaria para el acceso a repositorios,
-documentación, servicios cloud y herramientas de integración continua. El consumo
-eléctrico corresponde al equipo de desarrollo en uso durante la jornada de trabajo.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{lrrr}
-\hline
-\textbf{Concepto} & \textbf{Coste mensual} & \textbf{Meses} & \textbf{Total} \\
-\hline
-Conexión a internet & 20,00 € & 5 & 100,00 € \\
-Electricidad        & 30,00 € & 5 & 150,00 € \\
-\hline
-\textbf{Total indirectos} & & & 250,00 € \\
-\hline
-\end{tabular}
-\caption{Gastos indirectos del proyecto.}
-\label{tab:presupuesto-indirectos}
+\caption{Desglose del presupuesto del proyecto.}
+\label{tab:presupuesto}
 \end{table}

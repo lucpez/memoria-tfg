@@ -38,7 +38,7 @@ Al redactar desde cero o revisar texto existente, aplica **todas** las convencio
 ## Construcción de frases y párrafos
 
 - Frases largas (30–50 palabras) con cláusulas subordinadas enlazadas por "que", "mediante", "con el fin de".
-- Uso frecuente de **rayas** (—) para inserciones explicativas dentro de la frase.
+- Para los incisos, **comas por defecto**. Las **rayas** (—) se reservan, con moderación, para incisos que ya contienen comas dentro (donde más comas serían ambiguas) o para un énfasis puntual. No abusar: una raya cada pocos párrafos, no en cada frase.
 - Párrafos cortos: **2–4 frases**. Raramente más de 5.
 
 ---

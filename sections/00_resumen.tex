@@ -10,10 +10,33 @@
 
 \vspace{0.5cm}
 
-\textbf{Palabras clave:} % TODO: añadir palabras clave
+\textbf{Palabras clave:} cloud lock-in, interoperabilidad, infraestructura como código,
+multi-cloud, OpenTofu, FinOps, prueba de concepto, CLI.
 
 \vspace{0.5cm}
 
 \textbf{Resumen:}
 
-% TODO: Escribe aquí el resumen en español (aprox. 300-500 palabras).
+La computación en la nube se ha consolidado como el paradigma dominante para el despliegue de
+infraestructura, pero su adopción arrastra un problema estructural: el \textit{cloud lock-in},
+la dependencia de un proveedor concreto que hace técnica y económicamente costoso migrar a otro.
+Este problema se manifiesta en tres dimensiones que se refuerzan mutuamente —la infraestructura,
+el conocimiento y el coste—, y tiene su raíz en la falta de interoperabilidad real entre las
+plataformas cloud: cada proveedor impone sus propios servicios, formatos y herramientas, de modo
+que una misma arquitectura no puede trasladarse de una nube a otra sin reescribirla por completo.
+
+Este Trabajo de Fin de Grado propone \textbf{CloudPorter}, una herramienta de línea de comandos
+que aborda el lock-in a nivel de infraestructura. CloudPorter permite describir la infraestructura
+una única vez en un manifiesto en formato YAML, independiente del proveedor, y traducirla de forma
+determinista a plantillas de \textit{infraestructura como código} con OpenTofu para desplegarla
+en distintas nubes. Además de la traducción y el despliegue, la herramienta compara los costes
+estimados entre proveedores antes de comprometerse con uno y audita el manifiesto en busca de
+anti-patrones de seguridad, todo desde una misma definición agnóstica.
+
+El trabajo se plantea como una \textbf{prueba de concepto} desarrollada de forma iterativa: no
+busca entregar un producto terminado, sino construir algo básico pero funcional que demuestre la
+viabilidad de la interoperabilidad entre nubes. El resultado es una herramienta con cinco
+comandos —validación, auditoría, estimación de costes, traducción y despliegue—, soporte para
+recursos de cómputo y de base de datos, compatibilidad con Amazon Web Services y Microsoft Azure,
+y una aplicación de demostración de tres capas desplegable en ambas nubes a partir de un único
+manifiesto, sin más cambio que el del proveedor de destino.

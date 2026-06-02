@@ -3,7 +3,7 @@
 Este capítulo revisa las herramientas y soluciones existentes que abordan, total o
 parcialmente, los problemas descritos en el capítulo anterior. El objetivo no es
 realizar un catálogo exhaustivo, sino identificar qué resuelve cada categoría de
-herramientas y qué queda sin resolver — estableciendo así el hueco que CloudPorter
+herramientas y qué queda sin resolver, estableciendo así el hueco que CloudPorter
 pretende ocupar. A continuación se analizan las principales categorías: herramientas
 de infraestructura como código, soluciones de abstracción multi-cloud, herramientas
 de estimación de costes, plataformas como servicio y herramientas con componente
@@ -21,8 +21,8 @@ partida natural para abordar el problema del lock-in.
 \cite{azureBicep} son las herramientas IaC propias de AWS y Azure respectivamente.
 Permiten describir infraestructura de forma declarativa, pero están completamente
 acopladas al proveedor: una plantilla CloudFormation no puede desplegarse en Azure,
-ni un fichero Bicep en AWS. Representan el extremo máximo del lock-in tecnológico
-— toda la infraestructura definida con estas herramientas queda irrecuperable
+ni un fichero Bicep en AWS. Representan el extremo máximo del lock-in tecnológico:
+toda la infraestructura definida con estas herramientas queda irrecuperable
 fuera del ecosistema de su proveedor.
 
 \textbf{Terraform} \cite{terraformDocs} y su fork libre \textbf{OpenTofu}
@@ -32,7 +32,7 @@ posiciona frecuentemente como solución al problema del lock-in. Sin embargo, es
 posicionamiento es en gran medida un mito: aunque la herramienta es la misma,
 los recursos que se definen son completamente específicos de cada proveedor. Una
 instancia EC2 de AWS no es equivalente a una máquina virtual de Azure en términos
-de configuración — tienen parámetros, redes y modelos de seguridad distintos.
+de configuración: tienen parámetros, redes y modelos de seguridad distintos.
 Migrar una arquitectura Terraform de AWS a Azure implica reescribir la práctica
 totalidad de los ficheros de recursos \cite{cloudAgnosticMythRepo}.
 
@@ -40,7 +40,7 @@ totalidad de los ficheros de recursos \cite{cloudAgnosticMythRepo}.
 lenguaje de configuración propio, permite definir infraestructura en lenguajes de
 programación convencionales como Python, TypeScript o Go. Esto reduce la curva de
 aprendizaje para desarrolladores, pero no resuelve el problema de abstracción
-entre providers — los recursos siguen siendo específicos de cada cloud.
+entre providers: los recursos siguen siendo específicos de cada cloud.
 
 \section{Abstracción multi-cloud}
 
@@ -95,13 +95,13 @@ visibilidad y el control del gasto.
 la estimación de costes en entornos IaC. Se integra con Terraform y OpenTofu,
 analiza los ficheros de configuración y genera una estimación del coste mensual
 de la infraestructura antes de desplegarla. Su limitación principal es que opera
-sobre código Terraform ya escrito para un proveedor concreto — no permite
+sobre código Terraform ya escrito para un proveedor concreto, no permite
 comparar el coste de una misma arquitectura entre distintos clouds.
 
 En el ámbito empresarial, herramientas como \textbf{CloudHealth}
 \cite{cloudHealthDocs} ofrecen visibilidad centralizada del gasto multi-cloud,
-detección de recursos huérfanos y recomendaciones de optimización. Este problema
-—conocido como \hyperlink{cloud-sprawl}{\textbf{cloud sprawl}}— es especialmente relevante en organizaciones
+detección de recursos huérfanos y recomendaciones de optimización. Este problema,
+conocido como \hyperlink{cloud-sprawl}{\textbf{cloud sprawl}}, es especialmente relevante en organizaciones
 medianas y grandes: la proliferación descontrolada de recursos no monitorizados
 puede representar una fracción significativa del gasto cloud total \cite{flexera2026}.
 Sin embargo, estas herramientas operan sobre infraestructura ya desplegada, no
@@ -119,7 +119,7 @@ eliminan la infraestructura como concepto visible para el usuario.
 El usuario despliega su aplicación sin necesitar conocer el proveedor cloud
 subyacente, sin escribir IaC y sin gestionar redes o instancias. Esta simplicidad
 tiene un coste: el usuario cede el control total de la infraestructura a la
-plataforma, generando una nueva forma de dependencia — en este caso, con el
+plataforma, generando una nueva forma de dependencia, en este caso con el
 propio PaaS en lugar de con el cloud provider.
 
 Este enfoque es adecuado para aplicaciones que no requieren control fino de la
@@ -153,7 +153,10 @@ tienen consecuencias operativas y económicas directas.
 \section{Análisis comparativo}
 
 La tabla~\ref{tab:comparativa} resume las capacidades de las herramientas
-analizadas frente a los problemas identificados en el capítulo anterior.
+analizadas frente a los problemas identificados en el capítulo anterior. 
+
+Para cada dimensión, «Sí» indica que la herramienta aborda esa forma de lock-in, 
+«Parcial» que la aborda parcialmente y «No» que no la aborda.
 
 \begin{table}[H]
 \centering
@@ -164,11 +167,11 @@ analizadas frente a los problemas identificados en el capítulo anterior.
 CloudFormation / Bicep  & No      & No      & No      \\
 Terraform / OpenTofu    & Parcial & Parcial & No      \\
 Pulumi                  & Parcial & Parcial & No      \\
-Crossplane              & Sí      & Sí      & No      \\
-Score                   & Parcial & Parcial & No      \\
-Infracost               & No      & No      & Sí      \\
-CloudHealth             & No      & No      & Sí      \\
-Railway / Render / Fly  & Sí      & Sí      & Parcial \\
+Crossplane              & Sí      & Parcial & No      \\
+Score                   & No      & Parcial & No      \\
+Infracost               & No      & No      & Parcial \\
+CloudHealth             & No      & No      & Parcial \\
+Railway / Render / Fly  & Sí      & Sí      & No      \\
 Infracodebase           & Parcial & Sí      & No      \\
 \textbf{CloudPorter}         & \textbf{Sí} & \textbf{Sí} & \textbf{Sí} \\
 \hline
@@ -178,18 +181,32 @@ Infracodebase           & Parcial & Sí      & No      \\
 \end{table}
 
 Ninguna de las herramientas analizadas resuelve de forma conjunta las tres
-dimensiones del lock-in identificadas en el capítulo anterior. Las herramientas
-IaC multi-proveedor reducen parcialmente el lock-in de infraestructura pero
-trasladan al usuario la responsabilidad de conocer los recursos específicos de
-cada cloud, sin abordar el lock-in de conocimiento ni el económico. Las
-herramientas de abstracción multi-cloud eliminan esa responsabilidad pero
-requieren infraestructura adicional como plano de control y no ofrecen
-visibilidad económica. Las plataformas como servicio abstraen completamente la
-infraestructura a costa de generar una nueva forma de dependencia con el propio
-PaaS. Las herramientas de gestión del gasto cloud permiten estimar costes antes
-del despliegue, pero operan sobre infraestructura ya definida para un proveedor
-concreto sin posibilidad de hacer un analisis entre otros 
-provedores. Las herramientas con componente de inteligencia artificial delegan
-decisiones críticas a modelos de lenguaje sin garantías deterministas.
+dimensiones del lock-in identificadas en el capítulo anterior:
+
+\begin{itemize}
+    \item \textbf{Infraestructura como código multi-proveedor:} reduce parcialmente
+    el lock-in de infraestructura, pero traslada al usuario la responsabilidad de
+    conocer los recursos específicos de cada cloud, sin abordar el lock-in de
+    conocimiento ni el económico.
+
+    \item \textbf{Abstracción multi-cloud:} ofrece una capa de abstracción más
+    genuina, pero ninguna herramienta es autosuficiente: cada una deja fuera el
+    aprovisionamiento específico de cada proveedor —Crossplane lo delega en un plano
+    de control que el usuario debe operar, Score en una plataforma externa y
+    MultiCloudJ en el propio código de la aplicación— y ninguna ofrece visibilidad
+    económica.
+
+    \item \textbf{Plataformas como servicio:} abstraen completamente la
+    infraestructura, a costa de generar una nueva forma de dependencia con el propio
+    PaaS.
+
+    \item \textbf{Gestión del gasto cloud:} permite estimar costes antes del
+    despliegue, pero opera sobre infraestructura ya definida para un proveedor
+    concreto, sin posibilidad de comparar entre proveedores.
+
+    \item \textbf{Componente de inteligencia artificial:} delega decisiones críticas
+    a modelos de lenguaje sin garantías deterministas.
+\end{itemize}
+
 CloudPorter propone abordar las tres dimensiones de forma integrada, con un
 enfoque determinista y sin requerir infraestructura adicional.

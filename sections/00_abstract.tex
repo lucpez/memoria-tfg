@@ -1,6 +1,6 @@
 \newpage
 \begin{center}
-    {\large \textbf{[ENGLISH TITLE]}}
+    {\large \textbf{CloudPorter}}
 
     \vspace{0.2cm}
     {\normalsize \tfgAuthors}
@@ -10,10 +10,32 @@
 
 \vspace{0.5cm}
 
-\textbf{Keywords:} % TODO: add keywords
+\textbf{Keywords:} cloud lock-in, interoperability, infrastructure as code, multi-cloud,
+OpenTofu, FinOps, proof of concept, CLI.
 
 \vspace{0.5cm}
 
 \textbf{Abstract:}
 
-% TODO: Write the abstract in English (approx. 300-500 words).
+Cloud computing has become the dominant paradigm for deploying infrastructure, yet its adoption
+carries a structural problem: \textit{cloud lock-in}, the dependence on a specific provider that
+makes migrating to another technically and economically costly. This problem manifests across
+three mutually reinforcing dimensions —infrastructure, knowledge and cost— and stems from the
+lack of genuine interoperability between cloud platforms: each provider imposes its own services,
+formats and tooling, so that the same architecture cannot be moved from one cloud to another
+without rewriting it entirely.
+
+This Bachelor's thesis proposes \textbf{CloudPorter}, a command-line tool that addresses lock-in
+at the infrastructure level. CloudPorter lets the user describe their infrastructure once in a
+provider-agnostic YAML manifest and translate it deterministically into \textit{infrastructure
+as code} templates with OpenTofu, ready to deploy on different clouds. Beyond translation and
+deployment, the tool compares estimated costs across providers before committing to one and audits
+the manifest for security anti-patterns, all from a single agnostic definition.
+
+The work is framed as a \textbf{proof of concept} developed iteratively: rather than delivering a
+finished product, it aims to build something basic yet functional that demonstrates the viability
+of interoperability across clouds. The result is a tool with five commands —validation, auditing,
+cost estimation, translation and deployment—, support for compute and database resources,
+compatibility with Amazon Web Services and Microsoft Azure, and a three-tier demonstration
+application deployable on both clouds from a single manifest, changing nothing but the target
+provider.

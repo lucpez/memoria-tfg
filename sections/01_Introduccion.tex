@@ -14,8 +14,8 @@ durante su elaboración.
 
 Mi interés por las tecnologías cloud surgió de forma gradual durante los años de
 formación, a través de la exploración de distintos campos de la ingeniería del
-software. Mi acercamiento a \textbf{Amazon Web Services (AWS)} —y la obtención de
-la certificación \textbf{AWS Cloud Practitioner}— me permitió comprender de primera
+software. Mi acercamiento a \textbf{Amazon Web Services (AWS)}, y la obtención de
+la certificación \textbf{AWS Cloud Practitioner}, me permitió comprender de primera
 mano tanto las posibilidades que ofrece la nube como las fricciones que aparecen en
 cuanto se profundiza en su uso real.
 
@@ -28,8 +28,8 @@ me preparaba para desplegar en \textbf{Microsoft Azure} o en \textbf{Google Clou
 Platform (GCP)}; cada uno exige su propio proceso de aprendizaje.
 
 A esta dificultad se suma la opacidad en la estimación de costes. Aunque los
-proveedores ofrecen herramientas de cálculo —como la calculadora de costes de
-AWS—, su uso requiere conocimiento previo de los servicios contratados, acceso a
+proveedores ofrecen herramientas de cálculo, como la calculadora de costes de
+AWS, su uso requiere conocimiento previo de los servicios contratados, acceso a
 una cuenta activa y criterio suficiente para modelar correctamente el escenario
 de despliegue. En mis primeros pasos con la nube me encontré con que estimar qué
 iba a costar un despliegue era, en sí mismo, un problema no trivial.
@@ -39,28 +39,33 @@ a escala organizacional. En entornos profesionales, la elección de un proveedor
 no es una decisión puramente técnica: implica estudios económicos comparativos,
 negociaciones con proveedores, formación especializada del equipo y, en muchos
 casos, la dependencia de empresas externas especializadas en la gestión de
-infraestructura. Lo que conceptualmente debería ser sencillo —desplegar una
-aplicación en la nube— se convierte en un proceso complejo que requiere recursos
+infraestructura. Lo que conceptualmente debería ser sencillo, desplegar una
+aplicación en la nube, se convierte en un proceso complejo que requiere recursos
 y conocimientos que no siempre están disponibles.
 
 Es en este contexto donde surge la motivación para desarrollar \textbf{CloudPorter},
 una herramienta que permita describir infraestructura de forma agnóstica al
-proveedor y desplegarla en distintos clouds, reduciendo el coste de entrada,
+proveedor y desplegarla en distintos clouds, reduciendo el compromiso de entrada,
 facilitando la comparación económica entre alternativas y disminuyendo el grado
 de compromiso tecnológico que hoy exige la nube.
 
 \section{Objetivos}
 
 Este trabajo no se concibe como la implementación de un sistema cerrado y completo,
-sino como una exploración fundamentada de un problema real —el \textbf{cloud lock-in}— con el objetivo de construir una base sólida sobre la
-que seguir avanzando. Los requisitos que se presentan en el capítulo~\ref{cap:especificacion}
-describen el sistema en su forma ideal; los objetivos que se enuncian aquí definen
-la dirección del trabajo y el alcance que se persigue alcanzar.
+sino como una \textbf{prueba de concepto}: una implementación deliberadamente acotada
+cuyo fin es demostrar que la idea de fondo es viable, construyendo algo básico pero
+funcional, en lugar de entregar un producto terminado. Frente a un problema real y de
+gran magnitud —el \textbf{cloud lock-in}—, el TFG busca establecer una base sólida y
+fundamentada sobre la que seguir avanzando. Los requisitos que se presentan en el
+capítulo~\ref{cap:especificacion} describen el sistema en su forma ideal; los objetivos
+que se enuncian aquí definen la dirección del trabajo y el alcance que se persigue alcanzar.
 
 El \textbf{objetivo general} de este TFG es desarrollar \textbf{CloudPorter}, una
 herramienta que permita describir infraestructura cloud de forma agnóstica al
-proveedor y desplegarla en distintas plataformas, reduciendo el compromiso
-tecnológico y económico que hoy exige trabajar con la nube.
+proveedor y desplegarla en distintas plataformas, dotando de \textbf{interoperabilidad}
+a la infraestructura, la capacidad de trasladar una misma definición de un proveedor a
+otro sin reescribirla, y reduciendo así el compromiso tecnológico y económico que hoy
+exige trabajar con la nube.
 
 Para guiar el desarrollo hacia ese objetivo, se identifican los siguientes
 \textbf{objetivos específicos}:
@@ -131,6 +136,9 @@ entorno de desarrollo local.
 
 \subsection{Usos realizados}
 
+El uso de Claude Code se ha concentrado en dos vertientes complementarias, el desarrollo del
+software CloudPorter y la redacción de la memoria, que se detallan a continuación.
+
 \subsubsection*{Apoyo al desarrollo de CloudPorter}
 
 Claude Code se empleó como asistente de programación durante el ciclo de desarrollo iterativo
@@ -140,21 +148,13 @@ descrito en el capítulo~\ref{cap:desarrollo}. Los usos concretos incluyeron:
     \item \textbf{Generación y revisión de código:} implementación de módulos del traductor,
     plantillas Jinja2 y la lógica del mapper determinístico, revisados y validados por el
     autor antes de cada integración.
-    \item \textbf{Skills de flujo de trabajo:} se desarrollaron dos skills propias para
-    Claude Code —\texttt{create-issue} y \texttt{github-workflow}— que encapsulan las
-    convenciones del proyecto y asisten en la creación de issues y la revisión de workflows
-    de GitHub Actions.
-    \item \textbf{Reglas de contexto:} se configuró un fichero de reglas específico para
-    el módulo de traducción (\texttt{.claude/rules/translator.md}) que documenta las
-    convenciones de estructura del traductor y orienta al agente cuando trabaja en esa
-    parte del código.
     \item \textbf{Apoyo en depuración y diseño:} consultas sobre decisiones de arquitectura,
     resolución de errores en la suite de tests y revisión de pull requests.
 \end{itemize}
 
-En todos los casos, el código generado fue revisado, adaptado y validado por el autor
-mediante la suite de tests automatizados del proyecto —con un umbral mínimo de cobertura
-del 80\%— y mediante la ejecución manual de los flujos de despliegue sobre AWS y Azure.
+En todos los casos, el código generado fue revisado, adaptado y validado por el autor antes
+de cada integración. Los mecanismos concretos de validación se recogen en el apartado de
+validación de esta misma sección.
 
 \subsubsection*{Apoyo a la redacción de la memoria}
 
@@ -163,22 +163,21 @@ de los capítulos de esta memoria. Los usos concretos incluyeron:
 
 \begin{itemize}
     \item \textbf{Redacción de secciones:} generación de borradores de capítulos a partir
-    de indicaciones del autor, respetando el enfoque narrativo del TFG y las convenciones
-    de estilo definidas.
+    de indicaciones del autor.
     \item \textbf{Revisión lingüística y de estilo:} corrección de coherencia, fluidez y
     adecuación al registro académico en castellano.
-    \item \textbf{Skill de redacción:} se configuró una skill propia (\texttt{escritura-tfg})
-    que encapsula las convenciones de voz, estructura y estilo propias de esta memoria,
-    asegurando consistencia entre sesiones de trabajo.
-    \item \textbf{Contexto persistente:} se mantiene un fichero \texttt{CLAUDE.md} con el
-    enfoque narrativo del TFG, la estructura de capítulos y las instrucciones de redacción,
-    que se carga automáticamente en cada sesión de trabajo con el agente.
 \end{itemize}
 
 Todo el contenido generado ha sido revisado críticamente por el autor, que ha verificado
 la corrección técnica de las afirmaciones, la coherencia con el resto del documento y
 la adecuación a los requisitos académicos. Las decisiones de contenido —qué incluir,
 qué omitir, cómo enmarcar cada argumento— son en todo momento responsabilidad del autor.
+
+\subsection{Partes afectadas}
+
+El apoyo de la IA alcanzó la redacción de los capítulos de la memoria (incluida la traducción
+del resumen al inglés), los módulos de código de CloudPorter —traducción, estimación de costes
+y auditoría— y su suite de tests.
 
 \subsection{Validación}
 
@@ -188,7 +187,10 @@ siguientes:
 \begin{itemize}
     \item \textbf{Código:} suite de tests automatizados con cobertura mínima del 80\%,
     comprobaciones de tipos con mypy, análisis estático con Ruff y validación funcional
-    mediante despliegue real en AWS y Azure.
+    mediante despliegue real en AWS y Azure. Antes de integrar cada cambio, el autor empleó
+    \hyperlink{skill}{\textit{skills}} reusables propias para profundizar en su especificación, de modo que el
+    código resultante es comprendido y defendible por el autor. Estos estándares de calidad y
+    automatización se detallan en el capítulo~\ref{cap:planificacion}.
     \item \textbf{Memoria:} revisión manual de cada sección generada, contraste de datos
     técnicos con la documentación oficial de las herramientas y fuentes bibliográficas
     citadas, y compilación continua del documento LaTeX para verificar su integridad formal.
@@ -196,5 +198,6 @@ siguientes:
 
 \subsection{Periodo de uso}
 
-Las herramientas de IA descritas se emplearon durante todo el período de desarrollo e
-implementación del proyecto, comprendido entre febrero y mayo de 2026.
+Las herramientas de IA descritas se emplearon durante todo el período del proyecto, que abarca
+tanto la fase de investigación como la de desarrollo e implementación, comprendido entre febrero
+y mayo de 2026.

@@ -1,8 +1,8 @@
 \chapter{Especificación de requisitos}\label{cap:especificacion}
 
 Este capítulo presenta la especificación de requisitos de CloudPorter en dos niveles.
-En primer lugar se describe la visión completa del sistema — el problema que CloudPorter
-aspira a resolver en su totalidad —, partiendo de una identificación clara de los
+En primer lugar se describe la visión completa del sistema, el problema que CloudPorter
+aspira a resolver en su totalidad, partiendo de una identificación clara de los
 usuarios a los que va dirigida la herramienta. A continuación se delimita el alcance
 del trabajo, distinguiendo los requisitos que se abordan en este TFG de aquellos
 que quedan como líneas de evolución futura.
@@ -19,18 +19,20 @@ específicas de un proveedor supone una inversión de tiempo significativa, y el
 coste de comprometerse con uno sin poder comparar alternativas de forma sencilla
 desincentiva la experimentación.
 
-El segundo es el \textbf{equipo técnico o profesional} que trabaja en entornos
-con infraestructura ya desplegada o en fase de diseño. Para este perfil, el
-problema es organizacional y económico: la elección del proveedor implica estudios
-de costes, dependencias de conocimiento del equipo y dificultad para migrar si
-las condiciones cambian.
+El segundo es el \textbf{equipo técnico o profesional} que afronta la elección de
+proveedor al diseñar un nuevo despliegue, o que quiere conservar la libertad de
+cambiar de proveedor en el futuro. Para este perfil, el problema es organizacional
+y económico. La decisión implica estudios de costes comparativos, dependencias del
+conocimiento del equipo y el riesgo de quedar atado a un proveedor si las condiciones
+cambian.
 
 \section{Visión del sistema}
 
-CloudPorter se concibe como una herramienta que aborda el cloud lock-in en todas sus
-dimensiones, desde la infraestructura hasta el código, y desde la CLI hasta una
-plataforma de gestión completa. A continuación se describe el sistema en su forma
-más ambiciosa, sin restricciones de alcance.
+CloudPorter se concibe, en su forma ideal, como una herramienta que abordaría el
+cloud lock-in en todas sus dimensiones, desde la infraestructura hasta el código, y
+desde la CLI hasta una plataforma de gestión completa. Esta sección describe esa
+visión completa y aspiracional, sin restricciones de alcance; el subconjunto que
+este trabajo aborda realmente se delimita en la sección siguiente.
 
 \subsection{Núcleo de abstracción e infraestructura}
 
@@ -40,14 +42,14 @@ más ambiciosa, sin restricciones de alcance.
     datos, almacenamiento y otros recursos comunes.
     
     \item \textbf{Soporte multi-proveedor:} traducción del Manifest a multiples
-    cloud provider — AWS, Azure, GCP, Oracle Cloud, Alibaba Cloud u otros.
+    cloud provider: AWS, Azure, GCP, Oracle Cloud, Alibaba Cloud u otros.
 
     \item \textbf{Generación desde fuentes existentes:} capacidad de partir de
     un \texttt{docker-compose.yml} o una plantilla \textbf{Terraform} existente y
     traducirlos automáticamente a un CloudPorter Manifest listo para despliegue.
 
     \item \textbf{Cobertura de lock-in de código:} integración con herramientas
-    de abstracción a nivel de SDK —como \textbf{MultiCloudJ}— para cubrir
+    de abstracción a nivel de SDK, como \textbf{MultiCloudJ}, para cubrir
     también servicios con lock-in de código, como almacenamiento de objetos
     o colas de mensajes.
 \end{itemize}
@@ -122,7 +124,9 @@ más ambiciosa, sin restricciones de alcance.
 El sistema descrito en la sección anterior representa la visión completa y ambiciosa de CloudPorter.
 Dado el alcance de un Trabajo de Fin de Grado, se define un subconjunto acotado
 de requisitos suficiente para demostrar la viabilidad del enfoque y aportar valor
-real, sin comprometer la calidad de lo que se construye.
+real, sin comprometer la calidad de lo que se construye. Este subconjunto es el que
+delimita la prueba de concepto que constituye el núcleo del trabajo: lo
+mínimo necesario para evidenciar que el enfoque funciona de extremo a extremo.
 
 \section{Requisitos funcionales}
 
@@ -139,8 +143,8 @@ su versión inicial. Se presentan agrupados por área funcional.
     informando de errores de sintaxis o valores no soportados.
 
     \item \textbf{RF-03.} El sistema debe traducir el Manifest a plantillas
-    \textbf{OpenTofu} desplegables en \textbf{AWS} y \textbf{Microsoft Azure}
-    —la elección de ambas plataformas y la preferencia por OpenTofu sobre
+    \textbf{OpenTofu} desplegables en \textbf{AWS} y \textbf{Microsoft Azure}.
+    La elección de ambas plataformas y la preferencia por OpenTofu sobre
     Terraform se justifican en el capítulo~\ref{cap:planificacion}.
 
     \item \textbf{RF-04.} El sistema debe soportar los siguientes tipos de
@@ -186,12 +190,16 @@ su versión inicial. Se presentan agrupados por área funcional.
 \subsection{Seguridad}
 
 \begin{itemize}
-    \item \textbf{RF-11.} El sistema debe analizar las plantillas generadas
-    mediante herramientas de análisis estático de IaC antes del despliegue,
-    detectando configuraciones inseguras e informando al usuario.
+    \item \textbf{RF-11.} El sistema debe ofrecer, antes del despliegue, un análisis
+    de seguridad de la infraestructura definida en el Manifest que detecte
+    configuraciones o anti-patrones inseguros e informe al usuario.
 \end{itemize}
 
 \section{Requisitos no funcionales}
+
+Más allá de las funcionalidades concretas, el sistema debe satisfacer una serie de propiedades
+de calidad que condicionan su diseño y su evolución. Los siguientes requisitos no funcionales
+las recogen:
 
 \begin{itemize}
     \item \textbf{RNF-01. Determinismo:} dado un mismo Manifest y un mismo
@@ -203,7 +211,7 @@ su versión inicial. Se presentan agrupados por área funcional.
     de la herramienta.
 
     \item \textbf{RNF-03. Usabilidad:} el sistema debe poder utilizarse sin
-    conocimiento previo de los servicios específicos de AWS o Azure — el usuario
+    conocimiento previo de los servicios específicos de AWS o Azure: el usuario
     opera en términos del Manifest, no del proveedor.
 
     \item \textbf{RNF-04. Trazabilidad:} el sistema debe exponer las plantillas

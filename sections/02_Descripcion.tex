@@ -18,14 +18,14 @@ creciente conciencia sobre los riesgos de depender de un único proveedor. Sin
 embargo, este dato contrasta con la dificultad real que supone mover cargas de
 trabajo entre plataformas una vez que se ha iniciado el despliegue.
 
-El \textbf{cloud lock-in} —o dependencia del proveedor cloud— se produce cuando
+El \textbf{cloud lock-in}, o dependencia del proveedor cloud, se produce cuando
 una organización o individuo queda vinculado a una plataforma concreta de forma
 que migrar a otra resulta técnicamente complejo, económicamente costoso o
 ambas cosas a la vez. Esta dependencia no es accidental: los proveedores ofrecen
 servicios gestionados, integraciones nativas y modelos de precios que incentivan
 el uso de sus propias herramientas, generando un ecosistema difícil de abandonar.
 
-El problema se manifiesta en tres dimensiones que se refuerzan mutuamente:
+En este capítulo, el problema se estructura en tres dimensiones que se refuerzan mutuamente:
 
 \begin{itemize}
     \item \textbf{Lock-in de infraestructura:} los recursos desplegados en un
@@ -49,7 +49,7 @@ El problema se manifiesta en tres dimensiones que se refuerzan mutuamente:
     requiere conocimiento previo de los servicios a contratar y criterio suficiente
     para modelar correctamente el escenario de despliegue. Comparar el coste de
     una misma arquitectura en distintos proveedores exige dominar simultáneamente
-    los modelos de precios de cada uno —tarea que en la práctica recae en
+    los modelos de precios de cada uno, tarea que en la práctica recae en
     especialistas o empresas externas \cite{flexera2026}.
 \end{itemize}
 
@@ -89,6 +89,10 @@ servicios— afecten directamente a su operativa.
 Frente a este problema, se propone \textbf{CloudPorter}: una herramienta de línea de
 comandos que permite describir infraestructura cloud de forma agnóstica al
 proveedor y desplegarla en distintas plataformas a partir de una única definición.
+El objetivo último es dotar de interoperabilidad a la infraestructura cloud,
+la capacidad de trasladar una misma definición de un proveedor a otro sin reescribirla:
+una propiedad de la que el ecosistema actual carece y que constituye la raíz del problema
+del lock-in.
 
 El núcleo de CloudPorter es el \hyperlink{cloudporter-manifest}{\textbf{CloudPorter Manifest}}, un fichero en formato
 \textbf{YAML} que describe los recursos de infraestructura en términos genéricos, independientes de cualquier proveedor. A partir
@@ -131,8 +135,8 @@ Quedan \textbf{fuera del alcance} de este trabajo:
     \item \textbf{Soporte a Google Cloud Platform} y otros proveedores: el soporte
     a dos clouds es suficiente para demostrar la viabilidad del enfoque agnóstico.
 
-    \item \textbf{Almacenamiento de objetos:} los servicios de almacenamiento
-    —como \textbf{AWS S3} o \textbf{Azure Blob Storage}— implican lock-in a nivel
+    \item \textbf{Almacenamiento de objetos:} los servicios de almacenamiento,
+    como \textbf{AWS S3} o \textbf{Azure Blob Storage}, implican lock-in a nivel
     de código, no solo de infraestructura, lo que excede el alcance de este trabajo.
 
     \item \textbf{Análisis de seguridad avanzado:} aunque se reconoce la

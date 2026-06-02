@@ -1,0 +1,32 @@
+\chapter*{Anexo: Manual de instalación, despliegue y uso}
+\addcontentsline{toc}{chapter}{Anexo: Manual de instalación, despliegue y uso}
+
+\Lucas{Redactar este manual a partir del \texttt{README.md} del repositorio, que ya cubre la instalación, la descripción del manifiesto, los comandos y un ejemplo completo de uso. Adaptarlo al registro de la memoria (no copiarlo literal) y completar cada sección. La estructura siguiente está basada en la propuesta del tutor, adaptada a una herramienta de línea de comandos.}
+
+\section*{Requisitos previos}
+
+\Lucas{Completar: dependencias necesarias según el caso de uso (Python 3.14 y \texttt{uv} para instalar; OpenTofu para \texttt{translate}/\texttt{deploy}; AWS CLI y Azure CLI para desplegar en cada nube). Indicar qué comandos no requieren ninguna de estas dependencias.}
+
+\section*{Instalación}
+
+\Lucas{Completar: instalación con \texttt{uv tool install} (recomendada) y con \texttt{pip}, a partir del repositorio. Tomar de la sección «Install» del README.}
+
+\section*{Configuración de credenciales cloud}
+
+\Lucas{Completar: autenticación en cada proveedor antes de desplegar (\texttt{aws configure} para AWS, \texttt{az login} para Azure). Aclarar que solo es necesaria para \texttt{deploy}.}
+
+\section*{El manifiesto CloudPorter}
+
+\Lucas{Completar: estructura del manifiesto YAML (nombre y lista de recursos), tipos de recurso soportados (cómputo y base de datos) y sus campos. Reutilizar la tabla de campos del README.}
+
+\section*{Comandos disponibles}
+
+\Lucas{Completar: descripción de los cinco comandos (\texttt{validate}, \texttt{audit}, \texttt{estimate}, \texttt{translate}, \texttt{deploy}) con sus opciones principales (\texttt{--provider}, \texttt{--dry-run}, \texttt{--auto-approve}, \texttt{--verbose}).}
+
+\section*{Caso de uso: despliegue de la aplicación de tres capas}
+
+\Lucas{Completar: recorrido completo de extremo a extremo con el ejemplo \texttt{examples/inventory-app/} —validar, estimar costes, desplegar en AWS y en Azure desde el mismo manifiesto— con las salidas de cada comando. Enlazar con la demostración del capítulo~\ref{cap:evaluacion}.}
+
+\section*{Resolución de problemas frecuentes}
+
+\Lucas{Completar: problemas habituales y su solución (OpenTofu no instalado, credenciales no configuradas, proveedor no soportado, etc.).}
