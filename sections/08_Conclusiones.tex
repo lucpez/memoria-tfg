@@ -1,24 +1,122 @@
 \chapter{Conclusiones y trabajos futuros}\label{cap:conclusiones}
 
-% Párrafo introductorio: dónde se llegó y qué queda por delante.
-% Este capítulo tiene tanto peso como cualquier otro.
+Este capítulo cierra la memoria recogiendo el balance del trabajo realizado: en qué medida se
+han alcanzado los objetivos planteados, qué resultados y aportaciones se han obtenido, qué
+limitaciones delimitan lo construido y qué se ha aprendido durante el proceso. Por último, se
+trazan las líneas de evolución que quedan abiertas. Coherentemente con el carácter de prueba
+de concepto que articula todo el proyecto, las conclusiones no presentan un sistema terminado,
+sino el punto al que ha llegado una exploración fundamentada y la dirección en la que puede
+seguir creciendo.
 
 \section{Cumplimiento de los objetivos}
 
-\Lucas{Redactar: contrastar lo logrado frente a los objetivos del capítulo 1 y los requisitos del capítulo 4 — qué entró en la prueba de concepto y qué quedó fuera.}
+El objetivo general del trabajo, enunciado en el capítulo~\ref{cap:introduccion}, era desarrollar
+\textbf{CloudPorter}, una herramienta que permitiera describir infraestructura de forma agnóstica
+al proveedor y desplegarla en distintas plataformas, dotando de interoperabilidad a la
+infraestructura cloud. Ese objetivo se ha alcanzado dentro del alcance de prueba de concepto
+definido: un mismo manifiesto se traduce y se despliega en AWS y en Azure sin reescribirse, como
+se evidencia en la evaluación del capítulo~\ref{cap:evaluacion}.
+
+Los cuatro objetivos específicos se han cumplido igualmente. Se ha definido una abstracción
+cloud-agnóstica —el Manifest— que describe la infraestructura sin acoplarse a ningún proveedor; se
+ha demostrado que esa abstracción es desplegable en dos plataformas cloud reales; se ha incorporado
+visibilidad económica mediante la comparación de costes entre proveedores; y se ha ofrecido una
+interfaz de línea de comandos que no exige conocimiento previo de cada plataforma para operar la
+herramienta.
+
+Este cumplimiento se sostiene sobre la validación de requisitos recogida en el
+capítulo~\ref{cap:evaluacion}: todos los requisitos funcionales y no funcionales definidos para la
+versión inicial quedan satisfechos, como resume la tabla~\ref{tab:validacion-rf}. Conviene recordar,
+no obstante, que ese conjunto de requisitos es un subconjunto deliberadamente acotado de la visión
+completa descrita en el capítulo~\ref{cap:especificacion}: el trabajo no buscaba agotar el problema,
+sino demostrar que el enfoque es viable de extremo a extremo.
 
 \section{Principales resultados y aportaciones}
 
-\Lucas{Redactar: los resultados centrales del trabajo —herramienta con cinco comandos, cómputo y base de datos, AWS y Azure, demo de tres capas— y qué aporta frente al estado del arte (interoperabilidad real desde un manifiesto agnóstico).}
+El principal resultado del trabajo es una herramienta funcional con una interfaz de línea de comandos
+de cinco comandos —\texttt{validate}, \texttt{audit}, \texttt{estimate}, \texttt{translate} y
+\texttt{deploy}— que opera sobre un manifiesto agnóstico común. A partir de esa única definición, el
+sistema valida la infraestructura, audita anti-patrones de seguridad, compara costes entre
+proveedores, traduce a plantillas \textbf{OpenTofu} y despliega en \textbf{AWS} o en
+\textbf{Microsoft Azure}, con soporte para recursos de cómputo y de base de datos.
+
+La culminación de estos resultados es la demostración de extremo a extremo: una aplicación de
+inventario de tres capas —frontend, backend y base de datos— descrita en un único manifiesto y
+desplegada en ambas nubes sin más cambio que el del argumento \texttt{--provider}. Esta demostración
+materializa la propiedad que da sentido al proyecto, la interoperabilidad real de la infraestructura,
+y la convierte en algo más que una propuesta teórica.
+
+Frente al estado del arte analizado en el capítulo~\ref{cap:estado}, la aportación diferencial de
+CloudPorter reside en operar sobre una definición anterior a la traducción y común a todos los
+proveedores. Esa posición permite capacidades que las herramientas atadas a un proveedor concreto no
+ofrecen, como comparar el coste de una misma arquitectura entre nubes antes de comprometerse con
+ninguna, o auditar el diseño de forma agnóstica antes de incurrir en ningún coste.
 
 \section{Limitaciones del trabajo}
 
-\Lucas{Redactar: limitaciones del alcance —dos proveedores, tipos de recurso acotados, sin almacenamiento de objetos ni análisis de seguridad avanzado—, asumidas conscientemente por el carácter de prueba de concepto.}
+El alcance alcanzado conlleva una serie de limitaciones, asumidas conscientemente por el carácter de
+prueba de concepto del trabajo y ya anticipadas en la discusión del capítulo~\ref{cap:evaluacion}. La
+herramienta soporta dos proveedores y un conjunto acotado de tipos de recurso —cómputo y bases de
+datos relacionales—, suficientes para evidenciar la viabilidad del enfoque, pero lejos de la cobertura
+que exigiría un producto.
+
+Otras limitaciones delimitan con precisión la frontera de lo construido. Quedan fuera los servicios con
+lock-in a nivel de código, como el almacenamiento de objetos, cuya abstracción excede la infraestructura.
+El comando \texttt{audit} opera a nivel de manifiesto y no sustituye al análisis estático del HCL
+generado que realizan herramientas especializadas, sino que lo complementa en una fase más temprana.
+Por último, CloudPorter actúa en la fase de diseño y despliegue: genera infraestructura nueva, pero no
+migra infraestructura ya desplegada en producción. Tampoco gestiona su ciclo de vida completo: la
+eliminación de los recursos debe realizarse manualmente con OpenTofu, sin un comando de destrucción
+propio.
+
+Estas limitaciones no contradicen los resultados, sino que enmarcan su validez: la prueba de concepto
+funciona dentro del subconjunto definido y señala con claridad las direcciones en las que el trabajo
+puede crecer.
 
 \section{Reflexión personal sobre el aprendizaje}
 
-\Lucas{Redactar: reflexión personal sobre el proceso de aprendizaje —dificultades técnicas (diferencias AWS/Azure, referencias entre recursos), el trabajo con metodología iterativa y el uso de IA como apoyo—.}
+Más allá del producto construido, el proceso ha sido en sí mismo un aprendizaje. La dificultad técnica
+que más me sorprendió fue la magnitud de las diferencias entre proveedores: lo que en AWS se resuelve de
+forma implícita —referenciar la red por defecto, por ejemplo— en Azure exige declarar explícitamente un
+Resource Group, una red virtual o una clave SSH. Comprender esas asimetrías y, sobre todo, ocultarlas por
+completo tras un manifiesto idéntico fue el reto de diseño más exigente del proyecto.
+
+Especialmente revelador resultó el problema de las referencias entre recursos en tiempo de despliegue:
+que el frontend conociera la dirección del backend, o el backend el host de la base de datos, sin que el
+usuario tuviera que escribir la sintaxis de interpolación de cada nube. Resolverlo me obligó a entender
+en profundidad cómo cada proveedor expresa esas dependencias, y a apreciar el valor de una abstracción
+que las unifica.
+
+En el plano metodológico, trabajar con un diseño emergente bajo Kanban —sin un plan cerrado de
+antemano— me enseñó a tomar decisiones de arquitectura de forma incremental y a justificarlas en su
+contexto. También ha sido formativo el uso de \textbf{Claude Code} como colaborador: aprendí que su
+valor no está en delegarle el trabajo, sino en dirigirlo con instrucciones precisas y revisar
+críticamente cada resultado, manteniendo en todo momento la comprensión y la responsabilidad sobre lo
+producido.
 
 \section{Trabajo futuro}
 
-\Lucas{Redactar: líneas de evolución futura, alineadas con el capítulo 4 (GCP, interfaz web, componente agéntico, lock-in de código, monitorización, gestión de estado).}
+CloudPorter deja abiertas numerosas líneas de evolución, alineadas con la visión completa del
+capítulo~\ref{cap:especificacion}. La más inmediata es la ampliación de cobertura: soportar
+\textbf{Google Cloud Platform} y otros proveedores, incorporar nuevos tipos de recurso y permitir la
+generación de manifiestos a partir de fuentes existentes, como un fichero \texttt{docker-compose.yml}.
+
+Otras líneas amplían el sistema en profundidad. La cobertura del lock-in a nivel de código, mediante la
+integración con bibliotecas de abstracción de SDK, extendería el enfoque más allá de la infraestructura.
+En el plano FinOps, la monitorización del gasto en tiempo real y la detección de \hyperlink{cloud-sprawl}{cloud sprawl} actuarían sobre
+infraestructura ya desplegada, no solo en el diseño. Y una gestión de estado propia permitiría a la
+herramienta hacer seguimiento de los manifiestos desplegados, su proveedor y su versión, y sentaría
+la base para un comando de destrucción que retire la infraestructura desde la propia herramienta.
+
+Finalmente, las líneas de mayor ambición apuntan a la experiencia de usuario y la inteligencia del
+sistema: una interfaz web con gestión visual de la infraestructura y, sobre todo, un componente
+agéntico —un asistente en lenguaje natural y la exposición de las funcionalidades mediante el protocolo
+\hyperlink{mcp}{MCP}— que apoye al usuario en la generación del manifiesto y en el uso de la herramienta, siempre sobre
+la capa de traducción determinista que garantiza resultados predecibles. 
+
+En conjunto, estas líneas
+dibujan una misma trayectoria: la evolución de CloudPorter desde una herramienta de línea de comandos
+hacia una plataforma completa de gestión de infraestructura multi-cloud, la visión última recogida en
+el capítulo~\ref{cap:especificacion}. La prueba de concepto desarrollada no es, por tanto, un punto
+final, sino la validación del núcleo agnóstico sobre el que esa plataforma podría construirse, y una
+base sólida desde la que seguir abordando un problema tan amplio como el cloud lock-in.

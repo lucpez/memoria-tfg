@@ -548,10 +548,23 @@ el trabajo queda recogido en el \href{https://github.com/lucpez/cloudporter/issu
 
 El comando \texttt{audit} se apoya en un módulo independiente que analiza el manifiesto y
 devuelve una lista de hallazgos clasificados por nivel. En esta primera versión se implementan
-dos comprobaciones: un manifiesto sin recursos se reporta como error, no hay nada que desplegar,
-y una base de datos sin ninguna capa de cómputo que actúe como capa de aplicación se reporta como
-advertencia, dado que en un despliegue real la base de datos podría quedar accesible sin pasar por
-una capa intermedia. El comando termina con código de error solo si existe algún hallazgo de
+tres comprobaciones:
+
+\begin{itemize}
+    \item \textbf{Manifiesto sin recursos:} se reporta como \textit{error}, pues no hay nada
+    que desplegar.
+    \item \textbf{Base de datos sin capa de cómputo:} una base de datos sin ningún recurso de
+    cómputo que actúe como capa de aplicación se reporta como \textit{advertencia}, dado que en
+    un despliegue real la base de datos podría quedar accesible sin pasar por una capa intermedia.
+    \item \textbf{Todos los recursos de cómputo públicos:} un manifiesto en el que todos los
+    recursos de cómputo se exponen públicamente se reporta como \textit{advertencia}, y no como
+    error, porque, aunque componentes internos como un backend no deberían ser accesibles
+    directamente desde el exterior sino solo a través de la capa de presentación, existen
+    arquitecturas en las que exponerlos todos es legítimo —por ejemplo, un conjunto de servicios
+    independientes—, de modo que la herramienta avisa del posible riesgo sin impedir el despliegue.
+\end{itemize}
+
+El comando termina con código de error solo si existe algún hallazgo de
 nivel error; las advertencias no impiden el despliegue. Se soporta además una salida en formato
 JSON con identificadores estables para cada tipo de hallazgo, pensada para su integración en
 pipelines.

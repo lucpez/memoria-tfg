@@ -1,32 +1,275 @@
 \chapter*{Anexo: Manual de instalación, despliegue y uso}
 \addcontentsline{toc}{chapter}{Anexo: Manual de instalación, despliegue y uso}
 
-\Lucas{Redactar este manual a partir del \texttt{README.md} del repositorio, que ya cubre la instalación, la descripción del manifiesto, los comandos y un ejemplo completo de uso. Adaptarlo al registro de la memoria (no copiarlo literal) y completar cada sección. La estructura siguiente está basada en la propuesta del tutor, adaptada a una herramienta de línea de comandos.}
+Este anexo recoge la guía práctica de instalación, configuración y uso de \textbf{CloudPorter}.
+Su objetivo es que cualquier persona pueda poner la herramienta en marcha desde cero y reproducir
+el despliegue de una aplicación completa en la nube, desde la instalación hasta el caso de uso de
+extremo a extremo presentado en el capítulo~\ref{cap:evaluacion}.
 
 \section*{Requisitos previos}
 
-\Lucas{Completar: dependencias necesarias según el caso de uso (Python 3.14 y \texttt{uv} para instalar; OpenTofu para \texttt{translate}/\texttt{deploy}; AWS CLI y Azure CLI para desplegar en cada nube). Indicar qué comandos no requieren ninguna de estas dependencias.}
+La mayoría de las operaciones de CloudPorter funcionan sin configuración adicional; solo algunas
+requieren dependencias externas, que se instalan una sola vez según la tarea que se vaya a realizar:
+
+\begin{itemize}
+    \item \textbf{Python 3.14 y \texttt{uv}:} \texttt{uv} es el gestor de paquetes y entornos de
+    Python con el que se instala la herramienta, y se encarga además de proporcionar la versión de
+    Python necesaria. Se instala siguiendo su
+    \href{https://docs.astral.sh/uv/getting-started/installation/}{guía oficial}~\cite{uvDocs}.
+    \item \textbf{OpenTofu:} requerido por los comandos \texttt{translate} y \texttt{deploy}, que
+    generan y aplican las plantillas de infraestructura como código. Se instala desde su
+    \href{https://opentofu.org/docs/intro/install}{guía oficial}~\cite{opentofuDocs}.
+    \item \textbf{AWS CLI:} necesaria para desplegar en \textbf{Amazon Web Services}. Se instala
+    desde su \href{https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html}{guía
+    oficial} y se configura con \texttt{aws configure}.
+    \item \textbf{Azure CLI:} necesaria para desplegar en \textbf{Microsoft Azure}. Se instala
+    desde su \href{https://learn.microsoft.com/en-us/cli/azure/install-azure-cli}{guía oficial} y
+    se autentica con \texttt{az login}.
+\end{itemize}
+
+Los comandos \texttt{validate}, \texttt{audit} y \texttt{estimate} no requieren ninguna de estas
+dependencias, ya que operan únicamente sobre el manifiesto.
 
 \section*{Instalación}
 
-\Lucas{Completar: instalación con \texttt{uv tool install} (recomendada) y con \texttt{pip}, a partir del repositorio. Tomar de la sección «Install» del README.}
+La forma recomendada de instalar CloudPorter es mediante \texttt{uv}, que aísla la herramienta en
+su propio entorno y la deja disponible como un comando del sistema:
+
+\begin{lstlisting}
+uv tool install git+https://github.com/lucpez/cloudporter.git
+\end{lstlisting}
+
+Alternativamente, puede instalarse con \texttt{pip}, siempre que se disponga de Python 3.14:
+
+\begin{lstlisting}
+pip install git+https://github.com/lucpez/cloudporter.git
+\end{lstlisting}
 
 \section*{Configuración de credenciales cloud}
 
-\Lucas{Completar: autenticación en cada proveedor antes de desplegar (\texttt{aws configure} para AWS, \texttt{az login} para Azure). Aclarar que solo es necesaria para \texttt{deploy}.}
+El único comando que aprovisiona infraestructura real, \texttt{deploy}, requiere una
+\textbf{cuenta activa} en el proveedor de destino —AWS o Azure— y una autenticación previa frente
+a ella. CloudPorter delega esa autenticación en las herramientas oficiales de cada nube, cada una
+con su propio mecanismo:
+
+\begin{itemize}
+    \item \textbf{AWS:} la autenticación se realiza con el comando \texttt{aws login}, disponible a
+    partir de la versión 2.32.0 de la AWS CLI. Al ejecutarlo se abre el navegador para iniciar
+    sesión en la cuenta de AWS, y la CLI obtiene credenciales temporales que renueva de forma
+    automática, sin necesidad de gestionar claves de acceso de larga duración:
+
+\begin{lstlisting}
+aws login
+\end{lstlisting}
+
+    \item \textbf{Azure:} la autenticación es interactiva mediante tokens. Al ejecutar
+    \texttt{az login} se abre el navegador para iniciar sesión con la cuenta de Azure, y la CLI
+    gestiona después la renovación de los tokens de forma automática:
+
+\begin{lstlisting}
+az login
+\end{lstlisting}
+\end{itemize}
+
+El resto de comandos, incluidos \texttt{translate} y \texttt{estimate}, no necesita credenciales
+ni cuenta en ningún proveedor.
 
 \section*{El manifiesto CloudPorter}
 
-\Lucas{Completar: estructura del manifiesto YAML (nombre y lista de recursos), tipos de recurso soportados (cómputo y base de datos) y sus campos. Reutilizar la tabla de campos del README.}
+Todo en CloudPorter parte de un \textbf{manifiesto}, un fichero \textbf{YAML} con un nombre de
+proyecto (\texttt{name}) y una lista de recursos (\texttt{resources}). Cada recurso declara un
+campo \texttt{type} que determina los atributos disponibles. En la versión actual se soportan dos
+tipos de recurso: \texttt{compute} y \texttt{database}.
+
+El recurso de tipo \texttt{compute} representa una máquina virtual. La
+tabla~\ref{tab:campos-compute} recoge sus campos.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llp{7.2cm}}
+\hline
+\textbf{Campo} & \textbf{Obligatorio} & \textbf{Descripción} \\
+\hline
+\texttt{cpu}       & Sí & vCPUs mínimas; CloudPorter elige el tipo de instancia más ajustado \\
+\texttt{memory\_gb}& Sí & Memoria RAM mínima, en GB \\
+\texttt{os}        & Sí & \texttt{ubuntu-22.04}, \texttt{ubuntu-24.04} o \texttt{windows-server-2022} \\
+\texttt{public}    & No & \texttt{true} asigna una IP pública y abre el puerto 80. Por defecto, \texttt{false} \\
+\texttt{run}       & No & Script de shell que se ejecuta una vez en el primer arranque. Admite referencias \texttt{\{\{ nombre.private\_ip \}\}}, \texttt{\{\{ nombre.host \}\}} y \texttt{\{\{ var.nombre \}\}} \\
+\hline
+\end{tabular}
+\caption{Campos del recurso de tipo \texttt{compute}.}
+\label{tab:campos-compute}
+\end{table}
+
+El recurso de tipo \texttt{database} representa una base de datos relacional gestionada. La
+tabla~\ref{tab:campos-database} recoge sus campos.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llp{7.2cm}}
+\hline
+\textbf{Campo} & \textbf{Obligatorio} & \textbf{Descripción} \\
+\hline
+\texttt{engine}     & Sí & Motor de base de datos: \texttt{mysql} o \texttt{postgres} \\
+\texttt{cpu}        & Sí & vCPUs mínimas \\
+\texttt{memory\_gb} & Sí & Memoria RAM mínima, en GB \\
+\texttt{storage\_gb}& Sí & Almacenamiento en GB. Mínimo: 20 \\
+\hline
+\end{tabular}
+\caption{Campos del recurso de tipo \texttt{database}.}
+\label{tab:campos-database}
+\end{table}
+
+Un ejemplo mínimo de manifiesto con un único recurso de cómputo se muestra en el
+código~\ref{lst:manifest} del capítulo~\ref{cap:desarrollo}; un manifiesto completo que ejercita
+todos los campos se recoge más adelante, en el caso de uso de este anexo.
 
 \section*{Comandos disponibles}
 
-\Lucas{Completar: descripción de los cinco comandos (\texttt{validate}, \texttt{audit}, \texttt{estimate}, \texttt{translate}, \texttt{deploy}) con sus opciones principales (\texttt{--provider}, \texttt{--dry-run}, \texttt{--auto-approve}, \texttt{--verbose}).}
+CloudPorter expone cinco comandos que recorren el flujo completo, desde el manifiesto hasta la
+infraestructura en funcionamiento:
+
+\begin{lstlisting}
+cloudporter validate  manifiesto.yaml                  # comprueba que el manifiesto es valido
+cloudporter audit     manifiesto.yaml                  # detecta anti-patrones de arquitectura
+cloudporter estimate  manifiesto.yaml                  # compara el coste mensual entre nubes
+cloudporter translate manifiesto.yaml --provider aws   # genera plantillas OpenTofu
+cloudporter deploy    manifiesto.yaml --provider aws   # despliega la infraestructura
+\end{lstlisting}
+
+Cada comando recibe la ruta del manifiesto como argumento. El comando \texttt{audit} admite, además,
+la opción \texttt{--format}, que fija el formato de salida (\texttt{text}, por defecto, o
+\texttt{json}, pensado para su integración en pipelines).
+
+Los comandos \texttt{translate} y \texttt{deploy} requieren la opción \texttt{--provider}, que
+selecciona la nube de destino (\texttt{aws} o \texttt{azure}), y aceptan \texttt{--output} para
+indicar el directorio de salida y \texttt{--verbose} para mostrar la salida de OpenTofu. El comando
+\texttt{deploy} añade dos opciones propias del aprovisionamiento:
+
+\begin{itemize}
+    \item \textbf{\texttt{--dry-run}:} ejecuta el equivalente a \texttt{tofu plan}, mostrando los
+    recursos que se crearían sin aplicar ningún cambio real en la nube.
+    \item \textbf{\texttt{--auto-approve}:} suprime la confirmación interactiva previa al
+    aprovisionamiento, lo que permite integrar el comando en pipelines automatizados.
+\end{itemize}
+
+Por último, cualquier comando admite la opción \texttt{--help}, que muestra su descripción, los
+argumentos que acepta y las opciones disponibles; \texttt{cloudporter --help} lista todos los
+comandos, y \texttt{cloudporter --version} muestra la versión instalada.
 
 \section*{Caso de uso: despliegue de la aplicación de tres capas}
 
-\Lucas{Completar: recorrido completo de extremo a extremo con el ejemplo \texttt{examples/inventory-app/} —validar, estimar costes, desplegar en AWS y en Azure desde el mismo manifiesto— con las salidas de cada comando. Enlazar con la demostración del capítulo~\ref{cap:evaluacion}.}
+Esta sección recorre, paso a paso, el despliegue de una aplicación realista de inventario,
+disponible en el directorio \texttt{examples/inventory-app/} del repositorio. La aplicación sigue
+una arquitectura de tres capas —un frontend público servido con nginx, un backend privado en
+Node.js y una base de datos MySQL gestionada— descrita en un único manifiesto. El manifiesto
+completo, que ejercita todas las capacidades de la herramienta, es el siguiente:
+
+\begin{lstlisting}[language=yaml]
+name: inventory-app
+resources:
+
+  # Un recurso de computo es una maquina virtual.
+  - name: frontend
+    type: compute
+    cpu: 2              # vCPUs minimas; CloudPorter elige la instancia mas ajustada
+    memory_gb: 4        # RAM minima
+    os: ubuntu-22.04
+    public: true        # asigna IP publica y abre el puerto 80
+    run: |              # script de arranque, se ejecuta en el primer inicio
+      apt-get install -y nginx git
+      git clone https://github.com/myuser/myapp /app
+      # las referencias {{ recurso.atributo }} se resuelven en el despliegue
+      echo "proxy_pass http://{{ backend.private_ip }}:3000;" > /etc/nginx/proxy.conf
+      systemctl restart nginx
+
+  - name: backend
+    type: compute
+    cpu: 2
+    memory_gb: 4
+    os: ubuntu-22.04    # sin public: true, es una VM privada sin IP publica
+    run: |
+      apt-get install -y nodejs
+      export DB_HOST="{{ app-db.host }}"   # se resuelve al endpoint de la BD
+      node server.js
+
+  # Un recurso de base de datos es una BD relacional gestionada.
+  - name: app-db
+    type: database
+    engine: mysql
+    cpu: 2
+    memory_gb: 4
+    storage_gb: 20      # minimo: 20 GB
+\end{lstlisting}
+
+El flujo de trabajo recomendado recorre los comandos en orden, de menor a mayor compromiso. En
+primer lugar, \texttt{cloudporter validate examples/inventory-app/manifest.yaml} confirma que el
+manifiesto es sintácticamente correcto y respeta el esquema. A continuación,
+\texttt{cloudporter audit} analiza la arquitectura en busca de anti-patrones; sobre un manifiesto
+como este, con una base de datos respaldada por una capa de cómputo, no emite hallazgos, a
+diferencia del ejemplo del código~\ref{lst:audit}.
+
+El tercer paso, antes de comprometerse con ningún proveedor, es estimar el coste:
+\texttt{cloudporter estimate} consulta los precios en vivo y presenta una comparativa mensual entre
+AWS y Azure, en la línea de la salida recogida en el código~\ref{lst:estimate}. Con esa información,
+el despliegue se lanza sobre el proveedor elegido:
+
+\begin{lstlisting}
+cloudporter deploy examples/inventory-app/manifest.yaml --provider aws
+\end{lstlisting}
+
+Al finalizar, el comando imprime un resumen de los recursos creados con sus identificadores.
+
+\Lucas{Insertar la salida real del resumen de recursos que imprime \texttt{deploy} al completar el despliegue en AWS.}
+
+\Lucas{Insertar una captura de la aplicación de inventario accesible en el navegador tras el despliegue. Esta misma captura puede reutilizarse como evidencia en el capítulo~\ref{cap:evaluacion}.}
+
+La propiedad central de CloudPorter es que desplegar la misma aplicación en Azure no requiere
+ningún cambio en el manifiesto: basta con sustituir el valor del argumento \texttt{--provider}.
+
+\begin{lstlisting}
+cloudporter deploy examples/inventory-app/manifest.yaml --provider azure
+\end{lstlisting}
+
+CloudPorter resuelve internamente las diferencias entre ambas nubes —red, nomenclatura de
+instancias, claves de acceso— y produce una aplicación equivalente y accesible. Este recorrido es
+la base de la validación de interoperabilidad descrita en el capítulo~\ref{cap:evaluacion}.
+
+\section*{Eliminación de la infraestructura desplegada}
+
+\textbf{Importante:} en su versión actual, CloudPorter despliega infraestructura pero \textbf{no
+incluye un comando para destruirla}. Una vez desplegados, los recursos permanecen activos en la
+nube —y, por tanto, \textbf{generando coste}— hasta que se eliminan de forma explícita. Pasarlo por
+alto es la causa más habitual de cargos inesperados por recursos que ya no se necesitan.
+
+Para eliminar la infraestructura debe situarse en el directorio de salida que generó
+\texttt{translate} o \texttt{deploy} —por defecto \texttt{<nombre-del-proyecto>/<proveedor>}, o el
+indicado con \texttt{--output}— y ejecutar el comando de destrucción de OpenTofu:
+
+\begin{lstlisting}
+cd inventory-app/aws        # directorio generado para el proveedor desplegado
+tofu destroy -auto-approve
+\end{lstlisting}
+
+Este paso debe repetirse para cada proveedor en el que se haya desplegado. La incorporación de un
+comando de destrucción propio en CloudPorter queda recogida como trabajo futuro en el
+capítulo~\ref{cap:conclusiones}.
 
 \section*{Resolución de problemas frecuentes}
 
-\Lucas{Completar: problemas habituales y su solución (OpenTofu no instalado, credenciales no configuradas, proveedor no soportado, etc.).}
+A continuación se recogen las incidencias más habituales al utilizar la herramienta y su solución:
+
+\begin{itemize}
+    \item \textbf{OpenTofu no disponible:} si el binario de OpenTofu no está instalado,
+    \texttt{translate} genera igualmente las plantillas pero emite una advertencia, mientras que
+    \texttt{deploy} no puede continuar. Debe instalarse OpenTofu para aprovisionar infraestructura.
+    \item \textbf{Credenciales no configuradas:} un \texttt{deploy} sin autenticación previa falla
+    con un error del proveedor. Debe ejecutarse \texttt{aws configure} o \texttt{az login} según la
+    nube de destino.
+    \item \textbf{API de precios inalcanzable:} si alguna de las fuentes de precios no responde,
+    \texttt{estimate} termina con un error informativo en lugar de ofrecer una estimación
+    incompleta.
+    \item \textbf{Despliegue de bases de datos:} cuando el manifiesto contiene un recurso
+    \texttt{database}, el despliegue requiere la contraseña del administrador a través de la
+    variable \texttt{var.db\_password}, generada en el fichero \texttt{variables.tf}.
+\end{itemize}

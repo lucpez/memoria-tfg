@@ -185,14 +185,13 @@ requisitos definidos para la versión inicial se cumplen. Por otro, la prueba m�
 una aplicación realista en dos nubes distintas desde una única definición— se supera, lo que valida
 el enfoque de interoperabilidad como algo más que una propuesta teórica.
 
-Conviene, no obstante, enmarcar estos resultados en el carácter de prueba de concepto del trabajo,
-del que se derivan varias limitaciones. La herramienta soporta dos proveedores y un conjunto acotado
-de tipos de recurso, suficientes para demostrar la viabilidad, pero lejos de la cobertura de un
-producto. CloudPorter actúa además en la fase de diseño y despliegue, no migra infraestructura ya
-desplegada en producción. El análisis de seguridad opera a nivel de manifiesto y no sustituye al
-análisis estático del HCL generado que realizan herramientas especializadas. Por último, quedan
-fuera del alcance los servicios con lock-in a nivel de código, como el almacenamiento de objetos.
+Conviene, no obstante, enmarcar estos resultados en el alcance de la propia evaluación, acorde con
+el carácter de prueba de concepto del trabajo. La validación de extremo a extremo se concentra en un
+único escenario de demostración, representativo pero no exhaustivo, y la integración con la nube se
+comprueba mediante despliegues manuales, dado que la suite automatizada sustituye esa interacción por
+\textit{mocks}, según se detalló en el apartado de cobertura. Son, por tanto, limitaciones de la
+validación realizada, no del enfoque que esta valida.
 
-Estas limitaciones no contradicen los resultados, sino que delimitan su alcance: la evaluación
-demuestra que el enfoque funciona dentro del subconjunto definido, y señala con claridad las
-direcciones en las que el trabajo puede crecer, que se retoman en el capítulo~\ref{cap:conclusiones}.
+Junto a ellas existen las limitaciones de alcance de lo construido —el subconjunto de proveedores,
+tipos de recurso y servicios cubierto—, que no son objeto de este capítulo, sino del balance final:
+se retoman y discuten en el capítulo~\ref{cap:conclusiones}.
