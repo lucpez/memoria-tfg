@@ -218,11 +218,18 @@ el despliegue se lanza sobre el proveedor elegido:
 cloudporter deploy examples/inventory-app/manifest.yaml --provider aws
 \end{lstlisting}
 
-Al finalizar, el comando imprime un resumen de los recursos creados con sus identificadores.
+Al finalizar, el comando aplica la infraestructura y muestra los recursos creados con sus
+identificadores, como recoge la figura~\ref{fig:deploy-aws}.
 
-\Lucas{Insertar la salida real del resumen de recursos que imprime \texttt{deploy} al completar el despliegue en AWS.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/deploy_inventory_app_to_aws.png}
+\caption{Despliegue de la aplicación de inventario en AWS completado: aprovisionamiento de la base de datos y las instancias de cómputo con sus identificadores.}
+\label{fig:deploy-aws}
+\end{figure}
 
-\Lucas{Insertar una captura de la aplicación de inventario accesible en el navegador tras el despliegue. Esta misma captura puede reutilizarse como evidencia en el capítulo~\ref{cap:evaluacion}.}
+Una vez desplegada, la aplicación queda accesible en la dirección pública de su frontend, como
+muestra la figura~\ref{fig:demo-aws}.
 
 La propiedad central de CloudPorter es que desplegar la misma aplicación en Azure no requiere
 ningún cambio en el manifiesto: basta con sustituir el valor del argumento \texttt{--provider}.

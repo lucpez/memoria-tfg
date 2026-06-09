@@ -137,10 +137,23 @@ RNF-05. Mantenibilidad  & Cumplido & Estructura en capas orquestador-proveedor-r
 
 El caso de la aplicación de tres capas se desplegó con éxito sobre AWS y sobre Azure a partir del
 mismo manifiesto, sin más diferencia que el proveedor seleccionado, y la aplicación quedó accesible
-en ambos casos. Este resultado constituye la evidencia central de la interoperabilidad que persigue
-el trabajo.
+en ambos casos, como muestran las figuras~\ref{fig:demo-aws} y~\ref{fig:demo-azure}. Que la misma
+definición resulte funcional en dos nubes distintas, sin reescribir una sola línea, constituye la
+evidencia central de la interoperabilidad que persigue el trabajo.
 
-\Lucas{Insertar una o dos capturas como evidencia del despliegue: la aplicación de inventario accesible en el navegador y, opcionalmente, el resumen de recursos creados que imprime \texttt{deploy}.}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/inventory_app_works_in_aws.png}
+\caption{Aplicación de inventario en funcionamiento tras desplegarse en \textbf{AWS} desde el manifiesto.}
+\label{fig:demo-aws}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/inventory_app_works_in_azure.png}
+\caption{La misma aplicación, desplegada en \textbf{Azure} con el mismo manifiesto sin más cambio que el proveedor.}
+\label{fig:demo-azure}
+\end{figure}
 
 \subsection*{Estimación de costes y auditoría}
 
