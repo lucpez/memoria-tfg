@@ -52,6 +52,11 @@ este trabajo aborda realmente se delimita en la sección siguiente.
     de abstracción a nivel de SDK, como \textbf{MultiCloudJ}, para cubrir
     también servicios con lock-in de código, como almacenamiento de objetos
     o colas de mensajes.
+
+    \item \textbf{Gestión de estado y ciclo de vida:} seguimiento de los
+    manifiestos desplegados, su proveedor y su versión, con almacén embebido o
+    backend remoto para entornos multi-usuario, como base para gobernar el ciclo
+    de vida de la infraestructura desde la propia herramienta.
 \end{itemize}
 
 \subsection{FinOps y costes}
@@ -74,7 +79,8 @@ este trabajo aborda realmente se delimita en la sección siguiente.
     inseguras —permisos excesivos, puertos expuestos— antes del despliegue.
 
     \item \textbf{Auditoría continua:} integración con herramientas de auditoría
-    de seguridad cloud para la verificación continua del cumplimiento normativo.
+    de seguridad cloud, como \textbf{Prowler}~\cite{prowler}, que evalúen la
+    infraestructura ya desplegada frente a marcos de cumplimiento como CIS o NIST.
 \end{itemize}
 
 \subsection{Interfaz y experiencia de usuario}
@@ -128,10 +134,30 @@ real, sin comprometer la calidad de lo que se construye. Este subconjunto es el 
 delimita la prueba de concepto que constituye el núcleo del trabajo: lo
 mínimo necesario para evidenciar que el enfoque funciona de extremo a extremo.
 
+En concreto, el subconjunto abordado en este trabajo comprende:
+
+\begin{itemize}
+    \item \textbf{Dos proveedores cloud:} AWS y Microsoft Azure.
+    \item \textbf{Traducción y despliegue de extremo a extremo:} un Manifest en YAML,
+    agnóstico al proveedor, que se traduce de forma determinista a plantillas de OpenTofu
+    y se despliega sobre el proveedor elegido.
+    \item \textbf{Tipos de recurso:} cómputo, base de datos relacional gestionada y red
+    autogenerada.
+    \item \textbf{Estimación comparativa de costes} entre los proveedores soportados.
+    \item \textbf{Auditoría de seguridad} a nivel de manifiesto, mediante la detección de
+    anti-patrones.
+    \item \textbf{Interfaz de línea de comandos} como punto de entrada a todas estas
+    capacidades.
+\end{itemize}
+
+El resto de la visión completa queda fuera de esta versión y se recoge como líneas de
+evolución futura al final del capítulo.
+
 \section{Requisitos funcionales}
 
-Los siguientes requisitos funcionales definen el comportamiento del sistema en
-su versión inicial. Se presentan agrupados por área funcional.
+A partir del alcance definido en la sección anterior, los siguientes requisitos
+funcionales definen el comportamiento del sistema en su versión inicial. Se presentan
+agrupados por área funcional.
 
 \subsection{Manifest y traducción}
 
@@ -254,5 +280,9 @@ y se identifican como líneas de evolución futura:
     \item Cobertura de lock-in de código: integración con herramientas de
     abstracción a nivel de SDK para cubrir servicios con dependencia a nivel
     de código.
+
+    \item Análisis de seguridad avanzado: análisis estático de la infraestructura
+    generada —permisos excesivos, puertos expuestos— y auditoría continua del
+    cumplimiento, más allá de la detección de anti-patrones a nivel de manifiesto.
 
 \end{itemize}

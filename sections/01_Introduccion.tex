@@ -51,14 +51,15 @@ de compromiso tecnológico que hoy exige la nube.
 
 \section{Objetivos}
 
-Este trabajo no se concibe como la implementación de un sistema cerrado y completo,
-sino como una \textbf{prueba de concepto}: una implementación deliberadamente acotada
-cuyo fin es demostrar que la idea de fondo es viable, construyendo algo básico pero
-funcional, en lugar de entregar un producto terminado. Frente a un problema real y de
-gran magnitud —el \textbf{cloud lock-in}—, el TFG busca establecer una base sólida y
-fundamentada sobre la que seguir avanzando. Los requisitos que se presentan en el
+Este trabajo se concibe como una \textbf{prueba de concepto}: una implementación
+funcional y deliberadamente acotada, cuyo fin es demostrar que la idea de fondo es
+viable. Como tal, no aspira a cubrir toda la complejidad de una aplicación comercial,
+sino a resolver de forma sólida un núcleo representativo del problema y a sentar una
+base fundamentada sobre la que seguir construyendo. Frente a un reto real y de gran
+magnitud —el \textbf{cloud lock-in}—, esa acotación responde a una decisión consciente
+de alcance, no a una limitación del resultado. Los requisitos que se presentan en el
 capítulo~\ref{cap:especificacion} describen el sistema en su forma ideal; los objetivos
-que se enuncian aquí definen la dirección del trabajo y el alcance que se persigue alcanzar.
+que se enuncian aquí definen la dirección del trabajo y el alcance que se persigue.
 
 El \textbf{objetivo general} de este TFG es desarrollar \textbf{CloudPorter}, una
 herramienta que permita describir infraestructura cloud de forma agnóstica al
@@ -175,7 +176,7 @@ qué omitir, cómo enmarcar cada argumento— son en todo momento responsabilida
 
 \subsection{Partes afectadas}
 
-El apoyo de la IA alcanzó la redacción de los capítulos de la memoria (incluida la traducción
+El apoyo de la IA abarcó la redacción de los capítulos de la memoria (incluida la traducción
 del resumen al inglés), los módulos de código de CloudPorter —traducción, estimación de costes
 y auditoría— y su suite de tests.
 
@@ -188,7 +189,7 @@ siguientes:
     \item \textbf{Código:} suite de tests automatizados con cobertura mínima del 80\%,
     comprobaciones de tipos con mypy, análisis estático con Ruff y validación funcional
     mediante despliegue real en AWS y Azure. Antes de integrar cada cambio, el autor empleó
-    \hyperlink{skill}{\textit{skills}} reusables propias para profundizar en su especificación, de modo que el
+    \hyperlink{skill}{\textit{skills}} reusables propios para profundizar en su especificación, de modo que el
     código resultante es comprendido y defendible por el autor. Estos estándares de calidad y
     automatización se detallan en el capítulo~\ref{cap:planificacion}.
     \item \textbf{Memoria:} revisión manual de cada sección generada, contraste de datos

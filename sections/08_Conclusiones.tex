@@ -97,22 +97,35 @@ producido.
 \section{Trabajo futuro}
 
 CloudPorter deja abiertas numerosas líneas de evolución, alineadas con la visión completa del
-capítulo~\ref{cap:especificacion}. La más inmediata es la ampliación de cobertura: soportar
-\textbf{Google Cloud Platform} y otros proveedores, incorporar nuevos tipos de recurso y permitir la
-generación de manifiestos a partir de fuentes existentes, como un fichero \texttt{docker-compose.yml}.
+capítulo~\ref{cap:especificacion}. Se agrupan en varios frentes:
 
-Otras líneas amplían el sistema en profundidad. La cobertura del lock-in a nivel de código, mediante la
-integración con bibliotecas de abstracción de SDK, extendería el enfoque más allá de la infraestructura.
-En el plano FinOps, la monitorización del gasto en tiempo real y la detección de \hyperlink{cloud-sprawl}{cloud sprawl} actuarían sobre
-infraestructura ya desplegada, no solo en el diseño. Y una gestión de estado propia permitiría a la
-herramienta hacer seguimiento de los manifiestos desplegados, su proveedor y su versión, y sentaría
-la base para un comando de destrucción que retire la infraestructura desde la propia herramienta.
+\begin{itemize}
+    \item \textbf{Ampliación de cobertura:} soporte a \textbf{Google Cloud Platform} y otros
+    proveedores, nuevos tipos de recurso y la generación de manifiestos a partir de fuentes
+    existentes, como un fichero \texttt{docker-compose.yml}.
 
-Finalmente, las líneas de mayor ambición apuntan a la experiencia de usuario y la inteligencia del
-sistema: una interfaz web con gestión visual de la infraestructura y, sobre todo, un componente
-agéntico —un asistente en lenguaje natural y la exposición de las funcionalidades mediante el protocolo
-\hyperlink{mcp}{MCP}— que apoye al usuario en la generación del manifiesto y en el uso de la herramienta, siempre sobre
-la capa de traducción determinista que garantiza resultados predecibles. 
+    \item \textbf{Cobertura del lock-in a nivel de código:} integración con bibliotecas de
+    abstracción de SDK, que extendería el enfoque más allá de la infraestructura.
+
+    \item \textbf{Seguridad:} análisis estático de la infraestructura generada y auditoría
+    continua del cumplimiento; una vía natural sería integrar herramientas como
+    \textbf{Prowler}~\cite{prowler} para que, tras el despliegue, una orden adicional lance
+    comprobaciones de seguridad contra la infraestructura ya aprovisionada.
+
+    \item \textbf{FinOps:} monitorización del gasto en tiempo real y detección de
+    \hyperlink{cloud-sprawl}{cloud sprawl} sobre infraestructura ya desplegada, no solo en el
+    diseño.
+
+    \item \textbf{Gestión de estado:} seguimiento de los manifiestos desplegados, su proveedor
+    y su versión, que sentaría la base para un comando de destrucción que retire la
+    infraestructura desde la propia herramienta.
+
+    \item \textbf{Experiencia e inteligencia:} una interfaz web con gestión visual de la
+    infraestructura y, sobre todo, un componente agéntico —un asistente en lenguaje natural y
+    la exposición de las funcionalidades mediante el protocolo \hyperlink{mcp}{MCP}— que apoye
+    al usuario, siempre sobre la capa de traducción determinista que garantiza resultados
+    predecibles.
+\end{itemize} 
 
 En conjunto, estas líneas
 dibujan una misma trayectoria: la evolución de CloudPorter desde una herramienta de línea de comandos

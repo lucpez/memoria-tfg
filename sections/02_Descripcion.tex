@@ -53,7 +53,18 @@ En este capítulo, el problema se estructura en tres dimensiones que se refuerza
     especialistas o empresas externas \cite{flexera2026}.
 \end{itemize}
 
-A estas tres dimensiones se añade la \textbf{complejidad de seguridad} inherente
+Más allá de estas dimensiones, conviene distinguir el \textbf{nivel} en el que esta
+dependencia técnica se manifiesta. El lock-in de infraestructura descrito reside en los
+recursos que se aprovisionan, pero existe una forma más arraigada, el \textbf{lock-in a
+nivel de código}: cuando la propia aplicación utiliza de forma directa los servicios
+gestionados de un proveedor, la dependencia abandona la definición de la infraestructura
+y queda grabada en el código fuente. Migrar a otra nube ya no se limita entonces a las
+tres dimensiones anteriores —redescribir los recursos, reaprender los servicios y
+reestimar el coste—, sino que las arrastra hasta el propio código, que debe reescribirse
+o refactorizarse para funcionar con los servicios del nuevo proveedor. Es el mismo
+problema una capa por debajo, donde resulta bastante más difícil de revertir.
+
+A todo ello se añade la \textbf{complejidad de seguridad} inherente
 a la nube. Todos los proveedores cloud operan bajo un modelo de
 \hyperlink{shared-responsibility}{\textbf{responsabilidad compartida}}: el proveedor garantiza la seguridad de la
 infraestructura subyacente, pero la seguridad de lo que el usuario despliega sobre
@@ -138,9 +149,11 @@ Quedan \textbf{fuera del alcance} de este trabajo:
     \item \textbf{Soporte a Google Cloud Platform} y otros proveedores: el soporte
     a dos clouds es suficiente para demostrar la viabilidad del enfoque agnóstico.
 
-    \item \textbf{Almacenamiento de objetos:} los servicios de almacenamiento,
-    como \textbf{AWS S3} o \textbf{Azure Blob Storage}, implican lock-in a nivel
-    de código, no solo de infraestructura, lo que excede el alcance de este trabajo.
+    \item \textbf{Resolución del lock-in a nivel de código:} abstraer la dependencia que el
+    código de la aplicación contrae con servicios concretos de un proveedor —como
+    \textbf{AWS S3} o \textbf{Azure Blob Storage}— exigiría una interfaz agnóstica a casi
+    todos los servicios de cada nube, un problema de complejidad muy superior que excede
+    este trabajo.
 
     \item \textbf{Análisis de seguridad avanzado:} aunque se reconoce la
     complejidad del modelo de responsabilidad compartida, su abordaje requiere

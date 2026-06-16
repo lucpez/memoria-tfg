@@ -46,7 +46,7 @@ de implementación, el entorno de desarrollo, los controles de calidad y la auto
 
 \subsection{Kanban}
 
-Se ha adoptado \textbf{Kanban} como metodología de desarrollo por su adecuación
+Se ha adoptado \textbf{Kanban}~\cite{kanbanAtlassian} como metodología de desarrollo por su adecuación
 al carácter exploratorio del proyecto. Al emerger el diseño durante el propio
 desarrollo, no es posible anticipar cuánto trabajo conllevará cada ciclo ni cuánto
 durará, por lo que comprometerse de antemano con un volumen fijo de tareas por
@@ -57,7 +57,8 @@ razón se suma una de orden práctico: la dedicación al proyecto no pudo ser co
 al compaginarse con un empleo y otras asignaturas, sino concentrada en ráfagas, un
 patrón al que ese flujo continuo se adapta con naturalidad.
 
-El tablero Kanban se gestiona íntegramente en \textbf{GitHub Projects}, integrado
+El tablero Kanban se gestiona íntegramente en
+\textbf{\href{https://github.com/users/lucpez/projects/2}{GitHub Projects}}, integrado
 con el repositorio del código. Cada unidad de trabajo se representa como un
 \textit{issue} de GitHub, que recorre las columnas del tablero desde su definición
 hasta su cierre. Las columnas del tablero son:
@@ -136,6 +137,27 @@ Terraform con licencia MPL-2.0. OpenTofu mantiene compatibilidad con el ecosiste
 Terraform y elimina la ambigüedad legal. Para CloudPorter, que genera y distribuye
 plantillas de infraestructura como parte de su funcionalidad, la elección de
 OpenTofu es la única opción que garantiza libertad de uso sin restricciones.
+
+\subsection{Licencia de CloudPorter}
+
+CloudPorter se publica como \textbf{software libre} bajo licencia
+\textbf{\href{https://github.com/lucpez/cloudporter/blob/main/LICENSE}{Apache-2.0}}. La
+decisión extiende a la propia herramienta el mismo razonamiento que motivó la elección de
+OpenTofu: del mismo modo que OpenTofu nació para preservar la libertad que Terraform
+abandonó al adoptar una licencia restrictiva, CloudPorter se suma a esa defensa
+publicándose en abierto. No es una decisión accesoria: el proyecto se ha construido
+íntegramente sobre software libre —OpenTofu, Python, Jinja2 o pytest— y sobre el
+conocimiento abierto de la comunidad, de modo que liberar la herramienta devuelve a ese
+ecosistema parte de lo recibido. Sería, además, contradictorio combatir el lock-in con una
+herramienta a su vez encerrada.
+
+Ambas licencias pertenecen a la familia del software libre y comparten una protección
+expresa frente a patentes —una concesión a quien usa el software y la retirada de esa
+licencia a quien litigue por ellas—, pero difieren en su filosofía: la \textbf{MPL-2.0}
+de OpenTofu es un copyleft débil, que obliga a mantener abiertos los ficheros que se
+modifican, mientras que CloudPorter opta por la \textbf{Apache-2.0}, plenamente permisiva.
+Esa permisividad —usar, modificar e integrar la herramienta sin restricciones, también en
+contextos comerciales— es la que la inclina, al maximizar la adopción.
 
 \subsection{Lenguaje de implementación}
 
@@ -244,7 +266,9 @@ culmina con la redacción de los capítulos 1 a 5.
 La \textbf{fase de desarrollo} (abril–junio de 2026) implementa CloudPorter de forma
 iterativa a lo largo de las ocho iteraciones documentadas en el
 capítulo~\ref{cap:desarrollo}, con redacción simultánea de la memoria y una fase final
-de evaluación y validación.
+de evaluación y validación. El desarrollo iterativo que refleja la
+figura~\ref{fig:gantt} puede contrastarse con el historial de issues, pull requests y
+releases del \href{https://github.com/lucpez/cloudporter}{repositorio del proyecto}.
 
 \begin{figure}[H]
 \centering
@@ -322,16 +346,20 @@ El resto de conceptos se estima de la forma siguiente:
     cubrieron con los niveles gratuitos que ofrecen ambos proveedores, sin llegar a generar
     gasto.
 
-    \item \textbf{Software:} nulo. Todas las herramientas empleadas son de código abierto o
-    de uso gratuito —Python, OpenTofu, GitHub en su plan gratuito, uv, Ruff y pytest—, junto
-    con Claude Code en su modalidad de uso académico.
+    \item \textbf{Software:} la suscripción a \textbf{Claude Code}, asumida por el autor,
+    supuso 21,78~€/mes durante los tres meses de desarrollo (abril–junio de 2026), 65,34~€
+    en total. El resto de herramientas son de código abierto o de uso gratuito —Python,
+    OpenTofu, GitHub en su plan gratuito, uv, Ruff y pytest—.
 
-    \item \textbf{Suministros:} conexión a internet y electricidad del equipo durante los
-    meses de trabajo, a precios domésticos habituales.
+    \item \textbf{Suministros:} la parte imputable al proyecto del gasto doméstico de internet
+    y electricidad, estimada en torno a 60~€/mes durante los meses de trabajo.
 
-    \item \textbf{Formación:} sin coste. Durante la investigación se emplearon cursos y
-    recursos formativos gratuitos —tutoriales, documentación oficial y cursos en vídeo— y se
-    obtuvo la certificación OpenTofu Foundation, de la Linux Foundation, también gratuita.
+    \item \textbf{Formación:} incluye la formación previa en tecnologías cloud necesaria para
+    abordar el proyecto: la certificación \textbf{AWS Cloud Practitioner} (50~€, tras un
+    descuento del 50\% sobre su precio de 100~€) y un curso de preparación de la certificación
+    \textbf{AWS Solutions Architect Associate} (29,31~€). El resto de la formación fue gratuita:
+    documentación oficial, tutoriales en vídeo y la certificación OpenTofu Foundation, de la
+    Linux Foundation.
 \end{itemize}
 
 \begin{table}[H]
@@ -341,13 +369,13 @@ El resto de conceptos se estima de la forma siguiente:
 \textbf{Concepto} & \textbf{Coste} \\
 \hline
 Personal & 5.216,00 € \\
-Equipamiento informático & 1.200€ € \\
-Software & 0,00 € \\
+Equipamiento informático & 1.200,00 € \\
+Software & 65,34 € \\
 Infraestructura cloud & 0,00 € \\
-Formación & 0,00 € \\
+Formación & 79,31 € \\
 Suministros (internet y electricidad) & 300,00 € \\
 \hline
-\textbf{Total} & \textbf{6.716,00 €} \\
+\textbf{Total} & \textbf{6.860,65 €} \\
 \hline
 \end{tabular}
 \caption{Desglose del presupuesto del proyecto.}
